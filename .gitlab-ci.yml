@@ -1,0 +1,25 @@
+image: "python:3.6"
+
+stages:
+- test
+- build
+
+before_script:
+- pip install pycodestyle
+
+pep8:
+  stage: test
+  script:
+  - pycodestyle .
+
+buildWheel:
+  only:
+  - master
+  stage: build
+  script:
+  - python3 setup.py sdist
+  - python3 setup.py bdist_wheel
+
+  artifacts:
+    paths:
+    - dist
