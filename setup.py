@@ -25,8 +25,8 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='pytorch-template',
-    version=find_version('pytorch-template', '__init__.py'),
+    name='pytorch_template',
+    version=find_version('pytorch_template', '__init__.py'),
     description='PyTorch code and documentation template',  #  TODO: update
     long_description=long_description,
     author='Nextbit AI Team',
