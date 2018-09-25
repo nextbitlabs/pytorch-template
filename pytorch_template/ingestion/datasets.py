@@ -27,6 +27,7 @@ class IngestDataset(Dataset):
     def __len__(self) -> int:
         return len(self.filepaths)
 
+    # TODO: update
     def __getitem__(self,
                     idx: int) -> Tuple[np.array, float, str]:  # TODO: update return types
         filepath = os.path.join(self.root_dir, self.filepaths[idx])
@@ -60,14 +61,14 @@ class NpyDataset(Dataset):
     def __len__(self) -> int:
         return len(self.filepaths)
 
+    # TODO: update
     def __getitem__(self,
-                    idx: int) -> Tuple[str, np.array, int]:  # TODO: update return types
+                    idx: int) -> Tuple[np.array, float]:  # TODO: update return types
         filepath = self.filepaths[idx]
         features, target = np.load(filepath)
 
         sample = (features, target)
         if self.transform:
-            filename = os.path.basename(filepath).rsplit('.', 1)[0]
-            sample = self.transform(sample, filename=filename)
+            sample = self.transform(sample)
 
         return sample
