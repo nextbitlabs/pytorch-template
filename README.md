@@ -24,6 +24,8 @@ pytorch-template/                   [main folder]
 │   setup.cfg                       [parameters for CI/CD]
 │
 ├───data                            [data folder excluded from git tracking]
+│   │   targets.csv                 [targets for train, dev and test data]
+│   │
 │   ├───train
 │   │       ...
 │   ├───dev

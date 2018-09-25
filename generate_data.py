@@ -5,6 +5,7 @@
 import os
 
 import numpy as np
+import pandas as pd
 
 FEATURE_SIZE = 5
 WEIGHTS = np.array([5, 1, 3, 2, 4])
@@ -25,11 +26,20 @@ if __name__ == '__main__':
     training_targets = training_set @ WEIGHTS + BIAS + np.random.normal(TRAINING_SET_SIZE)
     validation_targets = validation_set @ WEIGHTS + BIAS + np.random.normal(VALIDATION_SET_SIZE)
 
-    for i, sample in enumerate(zip(training_set, training_targets)):
-        np.save(os.path.join('data', 'train', 'train_{:03d}.npy'.format(i)), sample)
+    dataframe = pd.DataFrame(columns=['target'])
+    dataframe.index.name = 'filepath'
 
-    for i, sample in enumerate(zip(validation_set, validation_targets)):
-        np.save(os.path.join('data', 'dev', 'dev_{:03d}.npy'.format(i)), sample)
+    for i, features in enumerate(training_set):
+        filename = os.path.join('train', 'train_{:03d}.npy'.format(i))
+        np.save(os.path.join('data', filename), features)
+        dataframe.loc[filename] = training_targets[i]
 
-    for i, sample in enumerate(test_set):
-        np.save(os.path.join('data', 'test', 'test_{:03d}.npy'.format(i)), sample)
+    for i, features in enumerate(validation_set):
+        filename = os.path.join('dev', 'dev_{:03d}.npy'.format(i))
+        np.save(os.path.join('data', filename), features)
+        dataframe.loc[filename] = validation_targets[i]
+
+    for i, features in enumerate(test_set):
+        np.save(os.path.join('data', 'test', 'test_{:03d}.npy'.format(i)), features)
+
+    dataframe.to_csv(os.path.join('data', 'targets.csv'), float_format='%.3f')
