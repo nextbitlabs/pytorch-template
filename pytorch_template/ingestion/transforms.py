@@ -2,6 +2,7 @@ import os
 from typing import Tuple
 
 import numpy as np
+import torch
 
 
 class ToFile:
@@ -17,3 +18,11 @@ class ToFile:
         output_path = os.path.join(self.output_dir, '{}.npy'.format(sample[2]))
         np.save(output_path, np.array(sample[:2]))
         return sample
+
+
+class ToTensor:
+
+    def __call__(self,
+                 sample: Tuple[np.array, float]) -> Tuple[torch.Tensor, torch.Tensor]:
+        # noinspection PyCallingNonCallable
+        return torch.from_numpy(sample[0]), torch.tensor(sample[1])
