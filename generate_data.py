@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 
-# TODO: delete this template specific file
+# TODO: delete this template-specific file
 
 import os
 
