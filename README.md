@@ -34,7 +34,7 @@ pytorch-template/                   [main folder]
 ├───docs                            [documentation folder]
 │       ...
 │
-├───pytorch_template                [package source code folder]
+└───pytorch_template                [package source code folder]
         ...
 ```
 
