@@ -9,6 +9,39 @@ new research deep learning project based on PyTorch.
 These instructions will get you a copy of the project up and running
 on your local machine for development and testing purposes.
 
+The project folder, including also files excluded from git versioning,
+has the following structure:
+
+```
+pytorch-template/                   [main folder]
+│   .gitignore                      [files ignored by git]
+│   .gitlab-ci.yml                  [GitLab CI/CD pipelines]
+│   cli.py                          [package command-line interface]
+│   LICENSE                         [code license]
+│   README.md                       [this file]
+│   requirements.txt                [package dependencies]
+│   setup.py                        [package setup script]
+│   setup.cfg                       [parameters for CI/CD]
+│
+├───data                            [data folder excluded from git tracking]
+│   ├───train
+│   │       ...
+│   ├───dev
+│   │       ...
+│   └───test
+│           ...
+│
+├───docs                            [documentation folder]
+│       ...
+│
+├───pytorch_template                [package source code folder]
+        ...
+```
+
+You should comply to this structure in all your projects,
+in particular you should structure the `data` folder containing your dataset
+according to the hierarchy shown. 
+
 ### Prerequisites
 
 In order to run the code you need to have Python 3.6 installed.
