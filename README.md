@@ -64,29 +64,59 @@ A command line interface is available to easily interact with the package.
 
 The available commands are:
 - `ingest`: preprocess raw data and export it in a suitable format for model
-training, necessary only if preprocessing is computationally expensive and
-many transformations are required;
-- `train`: train the deep learning model on ingested data
-- `eval`: evaluate the model on ingested validation data
+training;
+- `train`: train the deep learning model on ingested data;
+- `eval`: evaluate the model on ingested validation data;
 - `test`: produce model output on a single raw data sample.
 
-### Ingest
+### Command `ingest`
+
+The ingestion phase is useful if preprocessing is computationally expensive and
+many transformations are required. Here, for example, it is not really necessary
+but it is included to show the code structure.
+
+Optionally the `ingest` command can save some metadata about the dataset split,
+like dataset global statistics computed during the full pass of the dataset,
+in a pickle `.pkl` file and return the path of this file.
+
+In some cases an additional `safe-ingest` can be used to check and assure labels 
+coherence among the different dataset splits or to perform transformations
+that depend on other splits. Here it is not needed because the
+set of labels is not fixed since the example task is a regression.
+
+##### Flow
+
+```mermaid
+graph TD;
+    DataLoader-->|loop over|IngestDataset
+    IngestDataset-->|select|filepath
+    filepath-->|is used to read|features
+    filepath-->|is used to read|target
+    features-->|compose a|sample
+    target-->|composes a|sample
+    filepath-->|composes a|sample
+    sample-->|is normalized by|Normalize
+    Normalize-->|and saved on disk by|ToFile
+    ToFile-->decision{ingestion completed?}
+    decision-->|no|DataLoader
+    decision-->|yes|metadata
+    
+    style metadata stroke:#77d,stroke-width:2px
+```
+
+### Command `train`
 
 TODO
 
-### Train
+### Command `eval`
 
 TODO
 
-### Eval
+### Command `test`
 
 TODO
 
-### Test
-
-TODO
-
-## Performances
+## Performances
 
 TODO
 
@@ -97,4 +127,4 @@ TODO
 ## License
 
 This project is licensed under Proprietary License -
-see the [LICENSE.md](LICENSE.md) file for details
+see the [LICENSE](LICENSE) file for details
