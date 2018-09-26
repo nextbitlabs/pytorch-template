@@ -5,6 +5,20 @@ import numpy as np
 import torch
 
 
+class Normalize:
+
+    def __init__(self,
+                 mean: float,
+                 std: float):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self,
+                 sample: Tuple[np.array, float, str]) -> Tuple[np.array, float, str]:
+        normalized_features = (sample[0] - self.mean) / self.std
+        return normalized_features, sample[1], sample[2]
+
+
 class ToFile:
 
     def __init__(self,
