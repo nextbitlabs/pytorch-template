@@ -25,12 +25,12 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='pytorch_template',
+    name='pytorch_template',  # TODO: update
     version=find_version('pytorch_template', '__init__.py'),
-    description='PyTorch code and documentation template',  #  TODO: update
+    description='PyTorch code and documentation template',  # TODO: update
     long_description=long_description,
     author='Nextbit AI Team',
-    author_email='lgrementieri@nextbit.it',  #  TODO: update
+    author_email='lgrementieri@nextbit.it',  # TODO: update
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
@@ -39,7 +39,7 @@ setup(
         'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
-        'Intended Audience :: Data scientists',  #  TODO: update
+        'Intended Audience :: Data scientists',  # TODO: update
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
 
         # Pick your license as you wish
@@ -49,7 +49,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7'
     ],
-    keywords='AI deep learning pytorch template',  #  TODO: update
+    keywords='AI deep learning pytorch template',  # TODO: update
     packages=find_packages(exclude=['build', 'data', 'dist', 'docs', 'tests']),
     python_requires='>=3.6',
     install_requires=[

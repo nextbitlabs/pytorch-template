@@ -9,13 +9,14 @@ from .ingestion.datasets import IngestDataset
 from .ingestion.transforms import Normalize, ToFile
 
 
+# TODO: update class name
 class PyTorchTemplate:
 
     @staticmethod
     def ingest(root_dir: str,
                split: str,
                workers: int) -> str:
-        #  TODO: update transformations
+        # TODO: update transformations
         normalize = Normalize(0.5, 0.5)
         to_file = ToFile(os.path.join(root_dir, 'npy', split))
         transformation = transforms.Compose([normalize, to_file])
