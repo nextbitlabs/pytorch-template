@@ -63,8 +63,12 @@ class NpyDataset(Dataset):
         filepath = self.filepaths[idx]
         features, target = np.load(filepath)
 
-        sample = (features, target)
+        sample = (features.astype(np.float32), target)
         if self.transform:
             sample = self.transform(sample)
 
         return sample
+
+    @property
+    def features_shape(self):
+        return self[0][0].shape

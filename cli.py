@@ -48,10 +48,12 @@ class CLI:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(description='Train the model')
         #  TODO: update parameters and default values
-        parser.add_argument('npy-dir', type=str, help='Npy directory')
-        parser.add_argument('--batch-size', type=int, default=32,
+        parser.add_argument('npy_dir', type=str, help='Npy directory')
+        parser.add_argument('--output-dir', type=str, help='Output directory',
+                            default='./')
+        parser.add_argument('--batch-size', type=int, default=20,
                             help='Batch size')
-        parser.add_argument('--epochs', type=int, default=100,
+        parser.add_argument('--epochs', type=int, default=90,
                             help='Number of epochs')
         parser.add_argument('--lr', type=float, default=0.1,
                             help='Initial learning rate')
@@ -59,7 +61,7 @@ class CLI:
                             help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
-        PyTorchTemplate.train(args.npy_dir, args.batch_size,
+        PyTorchTemplate.train(args.npy_dir, args.output_dir, args.batch_size,
                               args.epochs, args.lr, args.workers)
 
     @staticmethod

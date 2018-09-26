@@ -1,12 +1,16 @@
+import logging
 import os
 import pickle
+import time
 
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from tqdm import tqdm
 
-from .ingestion.datasets import IngestDataset
-from .ingestion.transforms import Normalize, ToFile
+from .ingestion.datasets import IngestDataset, NpyDataset
+from .ingestion.transforms import Normalize, ToFile, ToTensor
+from .models.architecture import Architecture
+from .models.linear import LinearRegression
 
 
 # TODO: update class name
@@ -17,7 +21,7 @@ class PyTorchTemplate:
                split: str,
                workers: int) -> str:
         # TODO: update transformations
-        normalize = Normalize(0.5, 0.5)
+        normalize = Normalize(0, 1)
         to_file = ToFile(os.path.join(root_dir, 'npy', split))
         transformation = transforms.Compose([normalize, to_file])
 
@@ -33,3 +37,49 @@ class PyTorchTemplate:
         with open(metadata_path, 'wb') as f:
             pickle.dump({'num_files': len(dataset)}, f)
         return metadata_path
+
+    @staticmethod
+    def train(npy_dir: str,
+              output_dir: str,
+              batch_size: int,
+              epochs: int,
+              lr: float,
+              workers: int) -> None:
+        working_env = PyTorchTemplate._create_working_env(output_dir)
+
+        logging.info('Batch size: {}'.format(batch_size))
+        logging.info('Learning rate: {}'.format(lr))
+        logging.info('Workers: {}'.format(workers))
+
+        to_tensor = ToTensor()
+
+        train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size,
+                                  shuffle=True, num_workers=workers)
+
+        dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
+        dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
+                                shuffle=True, num_workers=workers)
+
+        model = LinearRegression(train_dataset.features_shape[-1])
+        architecture = Architecture(working_env, model)
+        architecture.fit(train_loader, epochs, lr, dev_loader)
+
+    @staticmethod
+    def _create_working_env(output_dir: str) -> str:
+        working_env = os.path.join(output_dir, 'runs', str(int(time.time())))
+        os.makedirs(os.path.join(working_env, 'checkpoints'))
+        os.makedirs(os.path.join(working_env, 'logs'))
+
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+        log_formatter = logging.Formatter('%(asctime)s | %(message)s')
+        file_handler = logging.FileHandler(os.path.join(working_env, 'logs',
+                                                        'train_info.log'))
+        file_handler.setFormatter(log_formatter)
+        logger.addHandler(file_handler)
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(log_formatter)
+        logger.addHandler(console_handler)
+
+        return working_env
