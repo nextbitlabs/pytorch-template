@@ -20,7 +20,7 @@ class PyTorchTemplate:
         to_file = ToFile(os.path.join(root_dir, 'npy', split))
         transformation = transforms.Compose([normalize, to_file])
 
-        dataset = IngestDataset(root_dir, split, 'targets.txt',
+        dataset = IngestDataset(root_dir, split, 'targets.csv',
                                 transform=transformation)
         loader = DataLoader(dataset, num_workers=workers)
         for _ in tqdm(loader, total=len(dataset),

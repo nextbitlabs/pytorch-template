@@ -15,8 +15,10 @@ class IngestDataset(Dataset):
                  transform: Optional[Callable[[np.array], np.array]] = None):
         self.root_dir = os.path.expanduser(os.path.normpath(root_dir))
         self.split = split
-        self.dataframe = pd.read_csv(os.path.join(self.root_dir, targets_file), index_col=0)
         self.transform = transform
+
+        self.dataframe = pd.read_csv(os.path.join(self.root_dir, targets_file), index_col=0)
+        self.dataframe = self.dataframe.filter(regex='^{}'.format(split), axis=0)
 
     def __len__(self) -> int:
         return len(self.dataframe)

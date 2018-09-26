@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from pytorch_template import PyTorchTemplate  # TODO: update
+from pytorch_template.main import PyTorchTemplate  # TODO: update
 
 
 class CLI:
@@ -34,14 +34,14 @@ class CLI:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(description='Ingest data')
         #  TODO: update parameters and default values
-        parser.add_argument('data-dir', type=str, help='Data directory')
+        parser.add_argument('data_dir', type=str, help='Data directory')
         parser.add_argument('split', type=str, help='Split name',
                             choices=['train', 'dev', 'test'])
         parser.add_argument('--workers', type=int, default=1,
                             help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
-        PyTorchTemplate.ingest(args.root_dir, args.split, args.workers)
+        PyTorchTemplate.ingest(args.data_dir, args.split, args.workers)
 
     @staticmethod
     def train() -> None:
