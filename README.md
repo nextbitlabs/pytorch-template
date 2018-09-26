@@ -60,6 +60,11 @@ python3.6 setup.py bdist_wheel
 pip3.6 install --no-index --find-links=dist pytorch_template -r requirements.txt
 ```
 
+Here data are synthetic so, in order to generate them run:
+```
+python3.6 generate_data.py
+```
+
 ## Usage
 
 A command line interface is available to easily interact with the package.
