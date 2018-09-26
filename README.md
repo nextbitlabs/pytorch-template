@@ -53,6 +53,8 @@ In order to run the code you need to have Python 3.6 installed.
 You can install the package on MacOS/Linux with the following commands:
 
 ```
+git clone git@gitlab.com:nextbit/AI-research/pytorch-template.git
+cd pytoorch-template
 python3.6 setup.py sdist
 python3.6 setup.py bdist_wheel
 pip3.6 install --no-index --find-links=dist pytorch_template -r requirements.txt
@@ -97,7 +99,7 @@ graph TD;
     filepath-->|composes a|sample
     sample-->|is normalized by|Normalize
     Normalize-->|and saved on disk by|ToFile
-    ToFile-->decision{ingestion completed?}
+    ToFile-->decision{ingestion<br/>completed?}
     decision-->|no|DataLoader
     decision-->|yes|metadata
     
