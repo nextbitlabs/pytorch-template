@@ -3,9 +3,12 @@ import os
 import pickle
 from typing import Optional
 
+import tensorboardX
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+
+from ..utils.monitors import Monitor
 
 
 class Architecture:
@@ -22,6 +25,8 @@ class Architecture:
             epochs: int,
             lr: float,
             dev_loader: Optional[DataLoader] = None):
+        summary_steps = 10  # TODO: update
+        writer = tensorboardX.SummaryWriter(os.path.join(self.working_env, 'logs'))
         with open(os.path.join(self.working_env, 'model_args.pkl'), 'wb') as f:
             pickle.dump(self.model.hyperparams, f)
 
@@ -35,13 +40,17 @@ class Architecture:
         scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer, step_size=epochs // 3, gamma=0.8)
 
-        log_string = 'Epoch {:d} - Step {:d} - Loss: {:.4f}'
-        val_log_string = 'Validation after epoch {:d} - Loss: {:.4f} - L1: {:.4f}'
+        total_step = 0
+        loss_monitor = Monitor()
+        log_string = 'Epoch {:d} - Loss: {:.4f}'
 
+        val_loss_monitor = Monitor() if validation else None
+        val_metric_monitor = Monitor() if validation else None
+        val_log_string = 'Validation after epoch {:d} - Loss: {:.4f} - L1: {:.4f}'
         for epoch in range(epochs):
-            total_loss = 0
             self.model.train()
-            for step, (features, targets) in enumerate(loader, start=1):
+            loss_monitor.reset()
+            for features, targets in loader:
                 optimizer.zero_grad()
 
                 features = features.to(self.device)
@@ -53,14 +62,16 @@ class Architecture:
                 optimizer.step()
                 scheduler.step()
 
-                total_loss += loss.data
-                logging.info(log_string.format(epoch, step, total_loss / step))
+                total_step += 1
+                loss_monitor.update(loss, targets)
+                if total_step % summary_steps == 0:
+                    writer.add_scalar('loss', loss_monitor.value, total_step)
+
+            logging.info(log_string.format(epoch, loss_monitor.value))
 
             if validation:
                 metric = nn.L1Loss()
 
-                total_loss = 0
-                total_metric = 0
                 with torch.no_grad():
                     self.model.eval()
                     for features, targets in dev_loader:
@@ -70,19 +81,21 @@ class Architecture:
                         loss = criterion(predictions, targets)
                         l1loss = metric(predictions, targets)
 
-                        total_loss += loss.data
-                        total_metric += l1loss.data
+                        val_loss_monitor.update(loss, targets)
+                        val_metric_monitor.update(l1loss, targets)
 
-                mean_loss = total_loss / len(dev_loader.dataset)
-                mean_metric = total_metric / len(dev_loader.dataset)
-                logging.info(val_log_string.format(epoch, mean_loss, mean_metric))
+                writer.add_scalar('val_loss', val_loss_monitor.value, total_step)
+                writer.add_scalar('val_metric', val_metric_monitor.value, total_step)
+                logging.info(val_log_string.format(
+                    epoch, val_loss_monitor.value, val_metric_monitor.value))
 
                 checkpoint_filename = 'model-{}_{:.3f}.ckpt'.format(
-                    epoch, total_metric / len(dev_loader.dataset))
+                    epoch, val_metric_monitor.value)
             else:
                 checkpoint_filename = 'model-{}.ckpt'.format(epoch)
 
             checkpoint_filepath = os.path.join(
                 self.working_env, 'checkpoints', checkpoint_filename)
-            print(self.model.state_dict())
             torch.save(self.model.state_dict(), checkpoint_filepath)
+
+        writer.close()
