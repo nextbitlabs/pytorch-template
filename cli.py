@@ -41,7 +41,9 @@ class CLI:
                             help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
-        PyTorchTemplate.ingest(args.data_dir, args.split, args.workers)
+        metadata_path = PyTorchTemplate.ingest(
+            args.data_dir, args.split, args.workers)
+        print('Metadata saved at {}'.format(metadata_path))
 
     @staticmethod
     def train() -> None:
@@ -61,8 +63,10 @@ class CLI:
                             help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
-        PyTorchTemplate.train(args.npy_dir, args.output_dir, args.batch_size,
-                              args.epochs, args.lr, args.workers)
+        best_checkpoint_path = PyTorchTemplate.train(
+            args.npy_dir, args.output_dir, args.batch_size, args.epochs,
+            args.lr, args.workers)
+        print('Best checkpoint saved at {}'.format(best_checkpoint_path))
 
     @staticmethod
     def eval() -> None:
@@ -77,8 +81,10 @@ class CLI:
                             help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
-        PyTorchTemplate.evaluate(args.checkpoint, args.npy_dir,
-                                 args.batch_size, args.workers)
+        val_loss, val_metric = PyTorchTemplate.evaluate(
+            args.checkpoint, args.npy_dir, args.batch_size, args.workers)
+        val_log_string = 'Validation - Loss: {:.4f} - Metric: {:.4f}'
+        print(val_log_string.format(val_loss, val_metric))
 
     @staticmethod
     def test() -> None:

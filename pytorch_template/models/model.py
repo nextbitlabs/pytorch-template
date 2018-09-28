@@ -24,7 +24,7 @@ class Model:
             loader: DataLoader,
             epochs: int,
             lr: float,
-            dev_loader: Optional[DataLoader] = None) -> None:
+            dev_loader: Optional[DataLoader] = None) -> str:
         summary_steps = 10  # TODO: update
         writer = tensorboardX.SummaryWriter(os.path.join(working_env, 'logs'))
         with open(os.path.join(working_env, 'model_args.pkl'), 'wb') as f:
@@ -43,6 +43,8 @@ class Model:
         loss_monitor = Monitor()
         log_string = 'Epoch {:d} - Loss: {:.4f}'
         val_log_string = 'Validation after epoch {:d} - Loss: {:.4f} - L1: {:.4f}'
+        best_checkpoint = ''
+        best_val_metric = float('inf')  # TODO:update lower/upper bound
         for epoch in range(epochs):
             self.module.train()
             loss_monitor.reset()
@@ -73,14 +75,21 @@ class Model:
                 logging.info(val_log_string.format(epoch, val_loss, val_metric))
                 checkpoint_filename = 'model-{:03d}_{:.3f}.ckpt'.format(
                     epoch, val_metric)
+                if val_metric < best_val_metric:  # TODO: update inequality
+                    best_checkpoint = checkpoint_filename
+                    best_val_metric = val_metric
             else:
                 checkpoint_filename = 'model-{:03d}.ckpt'.format(epoch)
+                best_checkpoint = checkpoint_filename
 
             checkpoint_filepath = os.path.join(
                 working_env, 'checkpoints', checkpoint_filename)
             torch.save(self.module.state_dict(), checkpoint_filepath)
 
         writer.close()
+        best_checkpoint_path = os.path.join(
+            working_env, 'checkpoints', best_checkpoint)
+        return best_checkpoint_path
 
     def eval(self,
              dev_loader: DataLoader) -> Tuple[float, float]:

@@ -2,6 +2,7 @@ import logging
 import os
 import pickle
 import time
+from typing import Tuple
 
 import torch
 from torch.utils.data import DataLoader
@@ -45,7 +46,7 @@ class PyTorchTemplate:
               batch_size: int,
               epochs: int,
               lr: float,
-              workers: int) -> None:
+              workers: int) -> str:
         working_env = PyTorchTemplate._create_working_env(output_dir)
 
         logging.info('Batch size: {}'.format(batch_size))
@@ -64,13 +65,15 @@ class PyTorchTemplate:
 
         module = LinearRegression(train_dataset.features_shape[-1])
         model = Model(module)
-        model.fit(working_env, train_loader, epochs, lr, dev_loader)
+        best_checkpoint_path = model.fit(
+            working_env, train_loader, epochs, lr, dev_loader)
+        return best_checkpoint_path
 
     @staticmethod
     def evaluate(checkpoint: str,
                  npy_dir: str,
                  batch_size: int,
-                 workers: int) -> None:
+                 workers: int) -> Tuple[float, float]:
         dev_dataset = NpyDataset(npy_dir, 'dev', transform=ToTensor())
         dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
                                 shuffle=False, num_workers=workers)
@@ -80,8 +83,7 @@ class PyTorchTemplate:
 
         model = Model(module)
         val_loss, val_metric = model.eval(dev_loader)
-        val_log_string = 'Validation - Loss: {:.4f} - L1: {:.4f}'
-        print(val_log_string.format(val_loss, val_metric))
+        return val_loss, val_metric
 
     @staticmethod
     def _create_working_env(output_dir: str) -> str:

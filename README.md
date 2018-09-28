@@ -112,10 +112,11 @@ graph TD;
     Normalize-->|and saved on disk by|ToFile
     ToFile-->decision{ingestion<br/>completed?}
     decision-->|no|DataLoader
-    decision-->|yes|metadata
-    
-    style metadata stroke:#77d,stroke-width:2px
+    decision-->|yes|metadata    
 ```
+
+The path to the dictionary metadata is printed to console 
+at the end of the computation.
 
 #### Examples
 
@@ -156,6 +157,8 @@ graph TD;
     LinearRegression2-->|is saved on|checkpoint[checkpoint file]
 ```
 
+The path to the best weight checkpoint according to the metric is printed
+to console at the end of the computation.
 
 #### Examples
 
