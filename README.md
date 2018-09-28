@@ -51,7 +51,6 @@ In order to run the code you need to have Python 3.6 installed.
 ### Installing
 
 You can install the package on MacOS/Linux with the following commands:
-
 ```
 git clone git@gitlab.com:nextbit/AI-research/pytorch-template.git
 cd pytoorch-template
@@ -61,7 +60,6 @@ pip3.6 install --no-index --find-links=dist pytorch_template -r requirements.txt
 ```
 
 Here data are synthetic so, in order to generate them run:
-
 ```
 python3.6 generate_data.py
 ```
@@ -104,7 +102,7 @@ coherence among the different dataset splits or to perform transformations
 that depend on other splits. Here it is not needed because the
 set of labels is not fixed since the example task is a regression.
 
-##### Flow
+#### Flow
 
 ```mermaid
 graph TD;
@@ -124,18 +122,16 @@ graph TD;
     style metadata stroke:#77d,stroke-width:2px
 ```
 
-##### Examples
+#### Examples
 
 Only the training set and the development set have to be ingested
 and that can be do with the following lines:
-
 ```
 python3.6 cli.py ingest data/ train --workers 4
 python3.6 cli.py ingest data/ dev --workers 4
 ```
 
 For more details on the usage you can access the help page with the command
-
 ```
 python3.6 cli.py ingest --help
 ```
@@ -145,6 +141,30 @@ python3.6 cli.py ingest --help
 The training phase has always the same structure and the template is built
 to keep all the trial models in files separated from the main training function.
 
+#### Examples
+
+The command has many optional parameters like `batch-size`, `epochs`, `lr`.
+
+The most basic training can be performed using only default values
+```
+python3.6 cli.py train data/npy
+```
+
+An equivalent form of the previous command with all the default values
+manually specified is:
+```
+python3.6 cli.py train data/npy \
+    --output-dir . \
+    --batch-size 20 \
+    --epochs 40 \
+    --lr 0.1 \
+    --workers 4
+```
+
+For more details on the usage you can access the help page with the command
+```
+python3.6 cli.py train --help
+```
 
 ### Command `eval`
 
