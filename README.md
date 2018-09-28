@@ -123,8 +123,8 @@ at the end of the computation.
 Only the training set and the development set have to be ingested
 and that can be do with the following lines:
 ```
-python3.6 cli.py ingest data/ train --workers 4
-python3.6 cli.py ingest data/ dev --workers 4
+python3.6 cli.py ingest data/ train
+python3.6 cli.py ingest data/ dev
 ```
 
 For more details on the usage you can access the help page with the command
@@ -153,7 +153,7 @@ graph TD;
     targets-->|contribute to|MSELoss
     MSELoss-->|updates|LinearRegression2[LinearRegression]
     LinearRegression2-->NpyDataset
-    LinearRegression2-->|is validated on|L1Loss
+    LinearRegression2-->|is evalued on|L1Loss
     LinearRegression2-->|is saved on|checkpoint[checkpoint file]
 ```
 
@@ -162,9 +162,12 @@ to console at the end of the computation.
 
 #### Examples
 
-The command has many optional parameters like `batch-size`, `epochs`, `lr`.
+The command has many optional parameters commonly tuned by the experimenter,
+like `batch-size`, `epochs`, `lr`.
 
-The most basic training can be performed using only default values
+The most basic training can be performed specifying just the directory containing the dataset,
+alredy splitted in `train` (compulsory) and `dev`(optional) folders
+using the default values for the other parameters.
 ```
 python3.6 cli.py train data/npy
 ```
@@ -172,12 +175,12 @@ python3.6 cli.py train data/npy
 An equivalent form of the previous command with all the default values
 manually specified is:
 ```
-python3.6 cli.py train data/npy \
+python3.6 cli.py train \
+    data/npy \
     --output-dir . \
     --batch-size 20 \
     --epochs 40 \
-    --lr 0.1 \
-    --workers 4
+    --lr 0.1
 ```
 
 For more details on the usage you can access the help page with the command
@@ -187,7 +190,48 @@ python3.6 cli.py train --help
 
 ### Command `eval`
 
-TODO
+The `eval` command reproduces the validation performed at the end of every epoch during the training phase.
+It is particularly useful when many datasets are available to evaluate the transfer learning performances.
+
+#### Flow
+
+The flow is almost the same of a single validation during the training phase.
+
+```mermaid
+graph TD;
+    DataLoader-->|loops over|NpyDataset
+    NpyDataset-->|selects|samples
+    samples-->|are composed by|features
+    samples-->|are composed by|targets
+    features-->|are analyzed by|LinearRegression
+    LinearRegression-->|produces|predictions
+    predictions-->|contribute to|L1Loss
+    targets-->|contribute to|L1Loss
+    L1Loss-->NpyDataset
+```
+
+#### Examples
+
+The most basic evaluation can be performed specifying just the model checkpoint to be evaluated and
+the directory containing the dataset, provided of a `dev` sub-folders,
+using the default values for the other parameters.
+```
+python3.6 cli.py eval data/npy
+```
+
+An equivalent form of the previous command with all the default values
+manually specified is:
+```
+python3.6 cli.py eval \
+    runs/<secfromepochs>/checkpoints/data/model-<epoch>-<metric>.ckpt
+    data/npy \
+    --batch-size 20
+```
+
+For more details on the usage you can access the help page with the command
+```
+python3.6 cli.py eval --help
+```
 
 ### Command `test`
 
