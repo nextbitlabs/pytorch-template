@@ -106,13 +106,8 @@ set of labels is not fixed since the example task is a regression.
 
 ```mermaid
 graph TD;
-    DataLoader-->|loop over|IngestDataset
-    IngestDataset-->|select|filepath
-    filepath-->|is used to read|features
-    filepath-->|is used to read|target
-    features-->|compose a|sample
-    target-->|composes a|sample
-    filepath-->|composes a|sample
+    DataLoader-->|loops over|IngestDataset
+    IngestDataset-->|selects a|sample
     sample-->|is normalized by|Normalize
     Normalize-->|and saved on disk by|ToFile
     ToFile-->decision{ingestion<br/>completed?}
@@ -139,7 +134,28 @@ python3.6 cli.py ingest --help
 ### Command `train`
 
 The training phase has always the same structure and the template is built
-to keep all the trial models in files separated from the main training function.
+to keep all the tried models in files separated from the main training function.
+
+#### Flow 
+
+The flow refers to a single epoch inside the `fit` function of the `Architecture` class.
+
+```mermaid
+graph TD;
+    DataLoader-->|loops over|NpyDataset
+    NpyDataset-->|selects|samples
+    samples-->|are composed by|features
+    samples-->|are composed by|targets
+    features-->|are analyzed by|LinearRegression1[LinearRegression]
+    LinearRegression1-->|produces|predictions
+    predictions-->|contribute to|MSELoss
+    targets-->|contribute to|MSELoss
+    MSELoss-->|updates|LinearRegression2[LinearRegression]
+    LinearRegression2-->NpyDataset
+    LinearRegression2-->|is validated on|L1Loss
+    LinearRegression2-->|is saved on|checkpoint[checkpoint file]
+```
+
 
 #### Examples
 
