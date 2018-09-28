@@ -138,7 +138,7 @@ to keep all the tried models in files separated from the main training function.
 
 #### Flow 
 
-The flow refers to a single epoch inside the `fit` function of the `Architecture` class.
+The flow refers to a single epoch inside the `fit` function of the `Model` class.
 
 ```mermaid
 graph TD;

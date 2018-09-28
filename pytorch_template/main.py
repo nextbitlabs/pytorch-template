@@ -9,8 +9,8 @@ from tqdm import tqdm
 
 from .ingestion.datasets import IngestDataset, NpyDataset
 from .ingestion.transforms import Normalize, ToFile, ToTensor
-from .models.architecture import Architecture
 from .models.linear import LinearRegression
+from .models.model import Model
 
 
 # TODO: update class name
@@ -45,6 +45,33 @@ class PyTorchTemplate:
               epochs: int,
               lr: float,
               workers: int) -> None:
+        working_env = PyTorchTemplate._create_working_env(output_dir)
+
+        logging.info('Batch size: {}'.format(batch_size))
+        logging.info('Learning rate: {}'.format(lr))
+        logging.info('Workers: {}'.format(workers))
+
+        to_tensor = ToTensor()
+
+        train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size,
+                                  shuffle=True, num_workers=workers)
+
+        dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
+        dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
+                                shuffle=True, num_workers=workers)
+
+        module = LinearRegression(train_dataset.features_shape[-1])
+        model = Model(working_env, module)
+        model.fit(train_loader, epochs, lr, dev_loader)
+
+    @staticmethod
+    def evaluate(checkpoint,
+                 npy_dir: str,
+                 batch_size: int,
+                 epochs: int,
+                 lr: float,
+                 workers: int) -> None:
         working_env = PyTorchTemplate._create_working_env(output_dir)
 
         logging.info('Batch size: {}'.format(batch_size))

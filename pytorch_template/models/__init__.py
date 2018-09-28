@@ -1,1 +1,2 @@
-from .architecture import *
+from .linear import *
+from .model import *
