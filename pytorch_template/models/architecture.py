@@ -70,10 +70,12 @@ class Architecture:
             logging.info(log_string.format(epoch, loss_monitor.value))
 
             if validation:
-                metric = nn.L1Loss()
+                metric = nn.L1Loss()  # TODO: update metrics
 
                 with torch.no_grad():
                     self.model.eval()
+                    val_loss_monitor.reset()
+                    val_metric_monitor.reset()
                     for features, targets in dev_loader:
                         features = features.to(self.device)
                         targets = targets.to(self.device)
