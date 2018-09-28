@@ -31,8 +31,8 @@ class Architecture:
             pickle.dump(self.model.hyperparams, f)
 
         validation = dev_loader is not None
-        # TODO: update loss
-        criterion = nn.MSELoss()
+
+        criterion = nn.MSELoss()  # TODO: update loss
         # TODO: update optimizer
         optimizer = torch.optim.SGD(self.model.parameters(), lr=lr,
                                     momentum=0.9, nesterov=True)
@@ -91,10 +91,10 @@ class Architecture:
                 logging.info(val_log_string.format(
                     epoch, val_loss_monitor.value, val_metric_monitor.value))
 
-                checkpoint_filename = 'model-{}_{:.3f}.ckpt'.format(
+                checkpoint_filename = 'model-{:03d}_{:.3f}.ckpt'.format(
                     epoch, val_metric_monitor.value)
             else:
-                checkpoint_filename = 'model-{}.ckpt'.format(epoch)
+                checkpoint_filename = 'model-{:03d}.ckpt'.format(epoch)
 
             checkpoint_filepath = os.path.join(
                 self.working_env, 'checkpoints', checkpoint_filename)
