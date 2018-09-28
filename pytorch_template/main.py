@@ -3,6 +3,7 @@ import os
 import pickle
 import time
 
+import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from tqdm import tqdm
@@ -59,38 +60,28 @@ class PyTorchTemplate:
 
         dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
         dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
-                                shuffle=True, num_workers=workers)
+                                shuffle=False, num_workers=workers)
 
         module = LinearRegression(train_dataset.features_shape[-1])
-        model = Model(working_env, module)
-        model.fit(train_loader, epochs, lr, dev_loader)
+        model = Model(module)
+        model.fit(working_env, train_loader, epochs, lr, dev_loader)
 
     @staticmethod
-    def evaluate(checkpoint,
+    def evaluate(checkpoint: str,
                  npy_dir: str,
                  batch_size: int,
-                 epochs: int,
-                 lr: float,
                  workers: int) -> None:
-        working_env = PyTorchTemplate._create_working_env(output_dir)
-
-        logging.info('Batch size: {}'.format(batch_size))
-        logging.info('Learning rate: {}'.format(lr))
-        logging.info('Workers: {}'.format(workers))
-
-        to_tensor = ToTensor()
-
-        train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size,
-                                  shuffle=True, num_workers=workers)
-
-        dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
+        dev_dataset = NpyDataset(npy_dir, 'dev', transform=ToTensor())
         dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
-                                shuffle=True, num_workers=workers)
+                                shuffle=False, num_workers=workers)
 
-        model = LinearRegression(train_dataset.features_shape[-1])
-        architecture = Architecture(working_env, model)
-        architecture.fit(train_loader, epochs, lr, dev_loader)
+        module = LinearRegression(dev_dataset.features_shape[-1])
+        module.load_state_dict(torch.load(checkpoint))
+
+        model = Model(module)
+        val_loss, val_metric = model.eval(dev_loader)
+        val_log_string = 'Validation - Loss: {:.4f} - L1: {:.4f}'
+        print(val_log_string.format(val_loss, val_metric))
 
     @staticmethod
     def _create_working_env(output_dir: str) -> str:

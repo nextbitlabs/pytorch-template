@@ -69,13 +69,16 @@ class CLI:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(description='Evaluate the model')
         #  TODO: update parameters and default values
-        parser.add_argument('model-dir', type=str, help='Model directory')
-        parser.add_argument('npy-dir', type=str, help='Npy directory')
+        parser.add_argument('checkpoint', type=str, help='Checkpoint path')
+        parser.add_argument('npy_dir', type=str, help='Npy directory')
+        parser.add_argument('--batch-size', type=int, default=20,
+                            help='Batch size')
         parser.add_argument('--workers', type=int, default=1,
                             help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
-        PyTorchTemplate.evaluate(args.model_dir, args.npy_dir, args.workers)
+        PyTorchTemplate.evaluate(args.checkpoint, args.npy_dir,
+                                 args.batch_size, args.workers)
 
     @staticmethod
     def test() -> None:

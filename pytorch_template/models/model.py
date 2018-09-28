@@ -1,7 +1,7 @@
 import logging
 import os
 import pickle
-from typing import Optional
+from typing import Optional, Tuple
 
 import tensorboardX
 import torch
@@ -14,25 +14,24 @@ from ..utils.monitors import Monitor
 class Model:
 
     def __init__(self,
-                 working_env: str,
                  module: nn.Module):
-        self.working_env = working_env
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.module = module.to(self.device)
+        self.criterion = nn.MSELoss()  # TODO: update
 
     def fit(self,
+            working_env: str,
             loader: DataLoader,
             epochs: int,
             lr: float,
-            dev_loader: Optional[DataLoader] = None):
+            dev_loader: Optional[DataLoader] = None) -> None:
         summary_steps = 10  # TODO: update
-        writer = tensorboardX.SummaryWriter(os.path.join(self.working_env, 'logs'))
-        with open(os.path.join(self.working_env, 'model_args.pkl'), 'wb') as f:
+        writer = tensorboardX.SummaryWriter(os.path.join(working_env, 'logs'))
+        with open(os.path.join(working_env, 'model_args.pkl'), 'wb') as f:
             pickle.dump(self.module.hyperparams, f)
 
         validation = dev_loader is not None
 
-        criterion = nn.MSELoss()  # TODO: update loss
         # TODO: update optimizer
         optimizer = torch.optim.SGD(self.module.parameters(), lr=lr,
                                     momentum=0.9, nesterov=True)
@@ -43,9 +42,6 @@ class Model:
         total_step = 0
         loss_monitor = Monitor()
         log_string = 'Epoch {:d} - Loss: {:.4f}'
-
-        val_loss_monitor = Monitor() if validation else None
-        val_metric_monitor = Monitor() if validation else None
         val_log_string = 'Validation after epoch {:d} - Loss: {:.4f} - L1: {:.4f}'
         for epoch in range(epochs):
             self.module.train()
@@ -57,7 +53,7 @@ class Model:
                 features = features.to(self.device)
                 targets = targets.to(self.device)
                 predictions = self.module(features)
-                loss = criterion(predictions, targets)
+                loss = self.criterion(predictions, targets)
 
                 loss.backward()
                 optimizer.step()
@@ -71,34 +67,39 @@ class Model:
             writer.add_scalar('lr', scheduler.get_lr()[0], total_step)
 
             if validation:
-                metric = nn.L1Loss()  # TODO: update metrics
-
-                with torch.no_grad():
-                    self.module.eval()
-                    val_loss_monitor.reset()
-                    val_metric_monitor.reset()
-                    for features, targets in dev_loader:
-                        features = features.to(self.device)
-                        targets = targets.to(self.device)
-                        predictions = self.module(features)
-                        loss = criterion(predictions, targets)
-                        l1loss = metric(predictions, targets)
-
-                        val_loss_monitor.update(loss, targets)
-                        val_metric_monitor.update(l1loss, targets)
-
-                writer.add_scalar('val_loss', val_loss_monitor.value, total_step)
-                writer.add_scalar('val_metric', val_metric_monitor.value, total_step)
-                logging.info(val_log_string.format(
-                    epoch, val_loss_monitor.value, val_metric_monitor.value))
-
+                val_loss, val_metric = self.eval(dev_loader)
+                writer.add_scalar('val_loss', val_loss, total_step)
+                writer.add_scalar('val_metric', val_metric, total_step)
+                logging.info(val_log_string.format(epoch, val_loss, val_metric))
                 checkpoint_filename = 'model-{:03d}_{:.3f}.ckpt'.format(
-                    epoch, val_metric_monitor.value)
+                    epoch, val_metric)
             else:
                 checkpoint_filename = 'model-{:03d}.ckpt'.format(epoch)
 
             checkpoint_filepath = os.path.join(
-                self.working_env, 'checkpoints', checkpoint_filename)
+                working_env, 'checkpoints', checkpoint_filename)
             torch.save(self.module.state_dict(), checkpoint_filepath)
 
         writer.close()
+
+    def eval(self,
+             dev_loader: DataLoader) -> Tuple[float, float]:
+        val_loss_monitor = Monitor()
+        val_metric_monitor = Monitor()
+        metric = nn.L1Loss()  # TODO: update metrics
+
+        with torch.no_grad():
+            self.module.eval()
+            val_loss_monitor.reset()
+            val_metric_monitor.reset()
+            for features, targets in dev_loader:
+                features = features.to(self.device)
+                targets = targets.to(self.device)
+                predictions = self.module(features)
+                loss = self.criterion(predictions, targets)
+                l1loss = metric(predictions, targets)
+
+                val_loss_monitor.update(loss, targets)
+                val_metric_monitor.update(l1loss, targets)
+
+        return val_loss_monitor.value, val_metric_monitor.value
