@@ -37,12 +37,9 @@ class CLI:
         parser.add_argument('data_dir', type=str, help='Data directory')
         parser.add_argument('split', type=str, help='Split name',
                             choices=['train', 'dev', 'test'])
-        parser.add_argument('--workers', type=int, default=1,
-                            help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
-        metadata_path = PyTorchTemplate.ingest(
-            args.data_dir, args.split, args.workers)
+        metadata_path = PyTorchTemplate.ingest(args.data_dir, args.split)
         print('Metadata saved at {}'.format(metadata_path))
 
     @staticmethod
@@ -59,13 +56,10 @@ class CLI:
                             help='Number of epochs')
         parser.add_argument('--lr', type=float, default=0.1,
                             help='Initial learning rate')
-        parser.add_argument('--workers', type=int, default=4,
-                            help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
         best_checkpoint_path = PyTorchTemplate.train(
-            args.npy_dir, args.output_dir, args.batch_size, args.epochs,
-            args.lr, args.workers)
+            args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr)
         print('Best checkpoint saved at {}'.format(best_checkpoint_path))
 
     @staticmethod
@@ -77,12 +71,10 @@ class CLI:
         parser.add_argument('npy_dir', type=str, help='Npy directory')
         parser.add_argument('--batch-size', type=int, default=20,
                             help='Batch size')
-        parser.add_argument('--workers', type=int, default=1,
-                            help='Number of workers')
 
         args = parser.parse_args(sys.argv[2:])
         val_loss, val_metric = PyTorchTemplate.evaluate(
-            args.checkpoint, args.npy_dir, args.batch_size, args.workers)
+            args.checkpoint, args.npy_dir, args.batch_size)
         val_log_string = 'Validation - Loss: {:.4f} - Metric: {:.4f}'
         print(val_log_string.format(val_loss, val_metric))
 

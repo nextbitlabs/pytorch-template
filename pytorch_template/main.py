@@ -20,8 +20,7 @@ class PyTorchTemplate:
 
     @staticmethod
     def ingest(root_dir: str,
-               split: str,
-               workers: int) -> str:
+               split: str) -> str:
         # TODO: update transformations
         normalize = Normalize(0, 1)
         to_file = ToFile(os.path.join(root_dir, 'npy', split))
@@ -29,7 +28,7 @@ class PyTorchTemplate:
 
         dataset = IngestDataset(root_dir, split, 'targets.csv',
                                 transform=transformation)
-        loader = DataLoader(dataset, num_workers=workers)
+        loader = DataLoader(dataset, num_workers=os.cpu_count())
         for _ in tqdm(loader, total=len(dataset),
                       desc='Writing {} feature files'.format(split)):
             pass
@@ -45,23 +44,24 @@ class PyTorchTemplate:
               output_dir: str,
               batch_size: int,
               epochs: int,
-              lr: float,
-              workers: int) -> str:
+              lr: float) -> str:
         working_env = PyTorchTemplate._create_working_env(output_dir)
 
         logging.info('Batch size: {}'.format(batch_size))
         logging.info('Learning rate: {}'.format(lr))
-        logging.info('Workers: {}'.format(workers))
 
         to_tensor = ToTensor()
 
         train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
         train_loader = DataLoader(train_dataset, batch_size=batch_size,
-                                  shuffle=True, num_workers=workers)
+                                  shuffle=True, num_workers=os.cpu_count())
 
-        dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
-        dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=workers)
+        if os.path.isdir(os.path.join(npy_dir, 'dev')):
+            dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
+            dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
+                                    shuffle=False, num_workers=os.cpu_count())
+        else:
+            dev_loader = None
 
         module = LinearRegression(train_dataset.features_shape[-1])
         model = Model(module)
@@ -72,11 +72,10 @@ class PyTorchTemplate:
     @staticmethod
     def evaluate(checkpoint: str,
                  npy_dir: str,
-                 batch_size: int,
-                 workers: int) -> Tuple[float, float]:
+                 batch_size: int) -> Tuple[float, float]:
         dev_dataset = NpyDataset(npy_dir, 'dev', transform=ToTensor())
         dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=workers)
+                                shuffle=False, num_workers=os.cpu_count())
 
         module = LinearRegression(dev_dataset.features_shape[-1])
         module.load_state_dict(torch.load(checkpoint))
