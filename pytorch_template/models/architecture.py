@@ -50,6 +50,7 @@ class Architecture:
         for epoch in range(epochs):
             self.model.train()
             loss_monitor.reset()
+            scheduler.step()
             for features, targets in loader:
                 optimizer.zero_grad()
 
@@ -60,7 +61,6 @@ class Architecture:
 
                 loss.backward()
                 optimizer.step()
-                scheduler.step()
 
                 total_step += 1
                 loss_monitor.update(loss, targets)
@@ -68,6 +68,7 @@ class Architecture:
                     writer.add_scalar('loss', loss_monitor.value, total_step)
 
             logging.info(log_string.format(epoch, loss_monitor.value))
+            writer.add_scalar('lr', scheduler.get_lr()[0], total_step)
 
             if validation:
                 metric = nn.L1Loss()  # TODO: update metrics
