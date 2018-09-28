@@ -53,7 +53,7 @@ class CLI:
                             default='./')
         parser.add_argument('--batch-size', type=int, default=20,
                             help='Batch size')
-        parser.add_argument('--epochs', type=int, default=90,
+        parser.add_argument('--epochs', type=int, default=30,
                             help='Number of epochs')
         parser.add_argument('--lr', type=float, default=0.1,
                             help='Initial learning rate')

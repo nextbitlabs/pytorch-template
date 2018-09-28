@@ -61,6 +61,7 @@ pip3.6 install --no-index --find-links=dist pytorch_template -r requirements.txt
 ```
 
 Here data are synthetic so, in order to generate them run:
+
 ```
 python3.6 generate_data.py
 ```
@@ -68,6 +69,13 @@ python3.6 generate_data.py
 ## Usage
 
 A command line interface is available to easily interact with the package.
+It is defined in the file `cli.py`.
+
+To see more details about the command line interface
+it is possible to show the help page using the command:
+```
+python3.6 cli.py --help
+``` 
 
 The available commands are:
 - `ingest`: preprocess raw data and export it in a suitable format for model
@@ -75,6 +83,11 @@ training;
 - `train`: train the deep learning model on ingested data;
 - `eval`: evaluate the model on ingested validation data;
 - `test`: produce model output on a single raw data sample.
+
+Every command has its separate help page that can be visualized with
+```
+python3.6 cli.py <command> --help
+```
 
 ### Command `ingest`
 
@@ -111,9 +124,27 @@ graph TD;
     style metadata stroke:#77d,stroke-width:2px
 ```
 
+##### Examples
+
+Only the training set and the development set have to be ingested
+and that can be do with the following lines:
+
+```
+python3.6 cli.py ingest data/ train --workers 4
+python3.6 cli.py ingest data/ dev --workers 4
+```
+
+For more details on the usage you can access the help page with the command
+
+```
+python3.6 cli.py ingest --help
+```
+
 ### Command `train`
 
-TODO
+The training phase has always the same structure and the template is built
+to keep all the trial models in files separated from the main training function.
+
 
 ### Command `eval`
 

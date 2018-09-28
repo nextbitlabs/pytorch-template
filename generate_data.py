@@ -24,9 +24,7 @@ if __name__ == '__main__':
     test_set = np.random.rand(TEST_SET_SIZE, FEATURE_SIZE)
 
     training_targets = training_set @ WEIGHTS + BIAS
-    training_targets += np.random.normal(size=TRAINING_SET_SIZE)
     validation_targets = validation_set @ WEIGHTS + BIAS
-    validation_targets += np.random.normal(size=VALIDATION_SET_SIZE)
 
     dataframe = pd.DataFrame(columns=['target'])
     dataframe.index.name = 'filepath'
