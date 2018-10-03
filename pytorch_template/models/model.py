@@ -27,7 +27,7 @@ class Model:
             dev_loader: Optional[DataLoader] = None) -> str:
         summary_steps = 10  # TODO: update
         writer = tensorboardX.SummaryWriter(os.path.join(working_env, 'logs'))
-        with open(os.path.join(working_env, 'model_args.pkl'), 'wb') as f:
+        with open(os.path.join(working_env, 'checkpoints', 'hyperparams.pkl'), 'wb') as f:
             pickle.dump(self.module.hyperparams, f)
 
         validation = dev_loader is not None

@@ -77,7 +77,9 @@ class PyTorchTemplate:
         dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
                                 shuffle=False, num_workers=os.cpu_count())
 
-        module = LinearRegression(dev_dataset.features_shape[-1])
+        with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
+            hyperparams = pickle.load(f)
+        module = LinearRegression(**hyperparams)
         module.load_state_dict(torch.load(checkpoint))
 
         model = Model(module)
