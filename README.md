@@ -212,18 +212,15 @@ graph TD;
 
 #### Examples
 
-The most basic evaluation can be performed specifying just the model checkpoint to be evaluated and
-the directory containing the dataset, provided of a `dev` sub-folders,
-using the default values for the other parameters.
-```
-python3.6 cli.py eval data/npy
-```
+The evaluation can be performed specifying just the model checkpoint
+to be evaluated and the directory containing the dataset, provided of a `dev` sub-folders.
+The batch size of evaluation batches can be manually specified otherwise its default
+value is 20.
 
-An equivalent form of the previous command with all the default values
-manually specified is:
+A full call to the command is:
 ```
 python3.6 cli.py eval \
-    runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt
+    runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
     data/npy \
     --batch-size 20
 ```
@@ -235,11 +232,36 @@ python3.6 cli.py eval --help
 
 ### Command `test`
 
-TODO
+The `test` command preforms the inference on a single file.
+
+#### Flow
+
+The flow is fairly simple.
+
+```mermaid
+graph TD;
+    features-->|are analyzed by|LinearRegression
+    LinearRegression-->|produces|prediction
+```
+
+#### Examples
+
+The test of the model is performed specifying the model checkpoint to be evaluated
+and the path to a sample, for example:
+```
+python3.6 cli.py test \
+    runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
+    data/test/<sample>.npy
+```
+
+For more details on the usage you can access the help page with the command
+```
+python3.6 cli.py test --help
+```
 
 ## Performances
 
-TODO
+The model converges to perfect predictions using default parameters.
 
 ## Deployment
 
