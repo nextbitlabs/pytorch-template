@@ -1,7 +1,7 @@
 import logging
 import os
 import pickle
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict
 
 import tensorboardX
 import torch
@@ -49,11 +49,11 @@ class Model:
             self.module.train()
             loss_monitor.reset()
             scheduler.step()
-            for features, targets in loader:
+            for samples in loader:
                 optimizer.zero_grad()
 
-                features = features.to(self.device)
-                targets = targets.to(self.device)
+                features = samples['features'].to(self.device)
+                targets = samples['target'].to(self.device)
                 predictions = self.module(features)
                 loss = self.criterion(predictions, targets)
 
@@ -101,9 +101,9 @@ class Model:
             self.module.eval()
             val_loss_monitor.reset()
             val_metric_monitor.reset()
-            for features, targets in dev_loader:
-                features = features.to(self.device)
-                targets = targets.to(self.device)
+            for samples in dev_loader:
+                features = samples['features'].to(self.device)
+                targets = samples['target'].to(self.device)
                 predictions = self.module(features)
                 loss = self.criterion(predictions, targets)
                 l1loss = metric(predictions, targets)
@@ -112,3 +112,11 @@ class Model:
                 val_metric_monitor.update(l1loss, targets)
 
         return val_loss_monitor.value, val_metric_monitor.value
+
+    def predict(self,
+                sample: Dict[str, torch.Tensor]) -> float:
+        features = sample['features'].to(self.device)
+        with torch.no_grad():
+            self.module.eval()
+            output = self.module(features).item()  # TODO: update if output is a vector
+        return output

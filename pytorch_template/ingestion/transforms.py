@@ -1,5 +1,5 @@
 import os
-from typing import Tuple
+from typing import Union, Dict
 
 import numpy as np
 import torch
@@ -14,9 +14,10 @@ class Normalize:
         self.std = std
 
     def __call__(self,
-                 sample: Tuple[np.array, float, str]) -> Tuple[np.array, float, str]:
-        normalized_features = (sample[0] - self.mean) / self.std
-        return normalized_features, sample[1], sample[2]
+                 sample: Dict[str, Union[np.array, float, str]]
+                 ) -> Dict[str, Union[np.array, float, str]]:
+        sample['features'] = (sample['features'] - self.mean) / self.std
+        return sample
 
 
 class ToFile:
@@ -28,15 +29,18 @@ class ToFile:
         self.output_dir = output_dir
 
     def __call__(self,
-                 sample: Tuple[np.array, float, str]) -> Tuple[np.array, float, str]:
-        output_path = os.path.join(self.output_dir, '{}.npy'.format(sample[2]))
-        np.save(output_path, np.array(sample[:2]))
+                 sample: Dict[str, Union[np.array, float, str]]
+                 ) -> Dict[str, Union[np.array, float, str]]:
+        output_path = os.path.join(
+            self.output_dir, '{}.npy'.format(sample['filename']))
+        np.save(output_path, np.array([sample['features'], sample['target']]))
         return sample
 
 
 class ToTensor:
 
     def __call__(self,
-                 sample: Tuple[np.array, float]) -> Tuple[torch.Tensor, torch.Tensor]:
-        # noinspection PyCallingNonCallable
-        return torch.from_numpy(sample[0]), torch.tensor(sample[1])
+                 sample: Dict[str, Union[np.array, float]]
+                 ) -> Dict[str, torch.Tensor]:
+        sample = {k: torch.tensor(v) for k, v in sample.items()}
+        return sample

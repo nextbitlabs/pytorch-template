@@ -1,8 +1,9 @@
 import os
-from typing import Optional, Callable, Tuple
+from typing import Union, Optional, Callable, Dict
 
 import numpy as np
 import pandas as pd
+import torch
 from torch.utils.data import Dataset
 
 
@@ -12,7 +13,7 @@ class IngestDataset(Dataset):
                  root_dir: str,
                  split: str,
                  targets_file: str,
-                 transform: Optional[Callable[[np.array], np.array]] = None):
+                 transform: Optional[Callable[[Dict], Dict]] = None):
         self.root_dir = os.path.expanduser(os.path.normpath(root_dir))
         self.split = split
         self.transform = transform
@@ -23,15 +24,17 @@ class IngestDataset(Dataset):
     def __len__(self) -> int:
         return len(self.dataframe)
 
-    # TODO: update
     def __getitem__(self,
-                    idx: int) -> Tuple[np.array, float, str]:  # TODO: update return types
+                    idx: int) -> Dict[str, Union[np.array, float, str]]:
+        # TODO: update return types
         filepath = os.path.join(self.root_dir, self.dataframe.index[idx])
-        features = np.load(filepath)
-        target = self.dataframe.iloc[idx, 0]
-        filename = os.path.basename(filepath).rsplit('.', 1)[0]
+        # TODO: update
+        sample = {
+            'features': np.load(filepath),
+            'target': self.dataframe.iloc[idx, 0],
+            'filename': os.path.basename(filepath).rsplit('.', 1)[0]
+        }
 
-        sample = (features, target, filename)
         if self.transform:
             sample = self.transform(sample)
 
@@ -44,7 +47,7 @@ class NpyDataset(Dataset):
     def __init__(self,
                  root_dir: str,
                  split: str,
-                 transform: Optional[Callable[[np.array], np.array]] = None):
+                 transform: Optional[Callable[[Dict], Dict]] = None):
         self.root_dir = os.path.expanduser(os.path.normpath(root_dir))
         self.split = split
         self.transform = transform
@@ -57,13 +60,17 @@ class NpyDataset(Dataset):
     def __len__(self) -> int:
         return len(self.filepaths)
 
-    # TODO: update
     def __getitem__(self,
-                    idx: int) -> Tuple[np.array, float]:  # TODO: update return types
+                    idx: int) -> Dict[str, Union[np.array, torch.Tensor]]:
+        # TODO: update return types
         filepath = self.filepaths[idx]
+        # TODO: update
         features, target = np.load(filepath)
+        sample = {
+            'features': features.astype(np.float32),
+            'target': target
+        }
 
-        sample = (features.astype(np.float32), target)
         if self.transform:
             sample = self.transform(sample)
 
@@ -71,4 +78,4 @@ class NpyDataset(Dataset):
 
     @property
     def features_shape(self):
-        return self[0][0].shape
+        return self[0]['features'].shape

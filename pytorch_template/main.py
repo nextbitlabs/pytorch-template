@@ -4,6 +4,7 @@ import pickle
 import time
 from typing import Tuple
 
+import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -85,6 +86,22 @@ class PyTorchTemplate:
         model = Model(module)
         val_loss, val_metric = model.eval(dev_loader)
         return val_loss, val_metric
+
+    @staticmethod
+    def test(checkpoint: str,
+             data_path: str) -> float:
+        with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
+            hyperparams = pickle.load(f)
+        module = LinearRegression(**hyperparams)
+        module.load_state_dict(torch.load(checkpoint))
+        model = Model(module)
+
+        to_tensor = ToTensor()  # TODO: update transformations
+
+        features = {'features': np.load(data_path).astype(np.float32)}  # TODO: update data loading
+        features = to_tensor(features)
+        prediction = model.predict(features)
+        return prediction
 
     @staticmethod
     def _create_working_env(output_dir: str) -> str:

@@ -9,15 +9,16 @@ class LinearRegression(nn.Module):
         super(LinearRegression, self).__init__()
         # TODO: update model layers
         self.fc = nn.Linear(features_size, 1)
-
-        # TODO: update initialization (with gain)
-        nn.init.xavier_normal_(self.fc.weight)
-
         self.hyperparams = {
             'features_size': features_size
         }
+        self._initialize_weights()
 
     def forward(self,
                 x: torch.Tensor) -> torch.Tensor:
         prediction = torch.squeeze(self.fc(x))
         return prediction
+
+    def _initialize_weights(self):
+        # TODO: update initialization (with gain)
+        nn.init.xavier_normal_(self.fc.weight)

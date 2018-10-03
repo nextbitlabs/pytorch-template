@@ -83,11 +83,12 @@ class CLI:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(description='Test the model')
         #  TODO: update parameters and default values
-        parser.add_argument('model-dir', type=str, help='Model directory')
-        parser.add_argument('data-dir', type=str, help='Data directory')
+        parser.add_argument('checkpoint', type=str, help='Checkpoint path')
+        parser.add_argument('data_path', type=str, help='Data file path')
 
         args = parser.parse_args(sys.argv[2:])
-        PyTorchTemplate.test(args.model_dir, args.data_dir)
+        prediction = PyTorchTemplate.test(args.checkpoint, args.data_path)
+        print('Output: {:.4f}'.format(prediction))
 
 
 if __name__ == '__main__':
