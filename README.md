@@ -223,7 +223,7 @@ An equivalent form of the previous command with all the default values
 manually specified is:
 ```
 python3.6 cli.py eval \
-    runs/<secfromepochs>/checkpoints/data/model-<epoch>-<metric>.ckpt
+    runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt
     data/npy \
     --batch-size 20
 ```
