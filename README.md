@@ -166,7 +166,7 @@ The command has many optional parameters commonly tuned by the experimenter,
 like `batch-size`, `epochs`, `lr`.
 
 The most basic training can be performed specifying just the directory containing the dataset,
-alredy splitted in `train` (compulsory) and `dev`(optional) folders
+already split in `train` (compulsory) and `dev`(optional) folders
 using the default values for the other parameters.
 ```
 python3.6 cli.py train data/npy
