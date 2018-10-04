@@ -265,7 +265,19 @@ The model converges to perfect predictions using default parameters.
 
 ## Deployment
 
-TODO 
+The template can be deployed on an NGC optimized instance, here we list
+the steps necessary to configure it on a AWS EC2 **p3.2xlarge** instance
+on the **NVIDIA Volta Deep Learning AMI** environment.
+
+1. Log in via ssh following the instructions on the EC2 Management Dashboard.
+2. Insert the Nvidia API key (register on developer.nvidia.com to get one).
+3. Clone the repo `pytorch-template` in the home directory.
+4. Run the script `gpu-install.sh`.
+5. Run the command `cd /pytorch-template`. 
+
+At the end of the procedure you will access to a terminal on a Docker
+container configured to work on the GPU and you could simply run the commands
+above leveraging the speed of parallel computing.
 
 ## License
 
