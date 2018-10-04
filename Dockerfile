@@ -5,6 +5,8 @@ RUN apt-get -y install screen htop
 RUN pip install --upgrade pip
 RUN pip install gpustat
 RUN pip3 install --upgrade pip
+
+# TODO: update according to requirements.txt (not including torch, torchvision)
 RUN pip3 install --upgrade pandas
 RUN pip3 install --upgrade tensorflow
 RUN pip3 install --upgrade tensorboard

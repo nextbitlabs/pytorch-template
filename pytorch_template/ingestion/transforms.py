@@ -42,5 +42,6 @@ class ToTensor:
     def __call__(self,
                  sample: Dict[str, Union[np.array, float]]
                  ) -> Dict[str, torch.Tensor]:
+        # noinspection PyCallingNonCallable
         sample = {k: torch.tensor(v) for k, v in sample.items()}
         return sample
