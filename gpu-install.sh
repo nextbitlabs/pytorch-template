@@ -5,6 +5,7 @@ nvidia-docker build -t template-env .
 nvidia-docker run \
 	--name=template \
 	--volume=$HOME/ebs:/ebs \
+	--volume=$HOME/pytorch-template:/pytorch-template \
 	-p 16006:6006 \
 	-it template-env:latest /bin/bash
 
