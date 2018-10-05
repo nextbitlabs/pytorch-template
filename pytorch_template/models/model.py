@@ -7,11 +7,13 @@ import tensorboardX
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from ..utils.monitors import Monitor
 
 
 class Model:
+    SUMMARY_STEPS = 10  # TODO: update
 
     def __init__(self,
                  module: nn.Module):
@@ -25,7 +27,6 @@ class Model:
             epochs: int,
             lr: float,
             dev_loader: Optional[DataLoader] = None) -> str:
-        summary_steps = 10  # TODO: update
         writer = tensorboardX.SummaryWriter(os.path.join(working_env, 'logs'))
         with open(os.path.join(working_env, 'checkpoints', 'hyperparams.pkl'), 'wb') as f:
             pickle.dump(self.module.hyperparams, f)
@@ -49,12 +50,12 @@ class Model:
             self.module.train()
             loss_monitor.reset()
             scheduler.step()
-            for samples in loader:
+            for samples in tqdm(loader, desc='Epoch {}'.format(epoch)):
                 optimizer.zero_grad()
 
-                features = samples['features'].to(self.device)
+                inputs = samples['features'].to(self.device)
                 targets = samples['target'].to(self.device)
-                predictions = self.module(features)
+                predictions = self.module(inputs)
                 loss = self.criterion(predictions, targets)
 
                 loss.backward()
@@ -62,7 +63,7 @@ class Model:
 
                 total_step += 1
                 loss_monitor.update(loss, targets)
-                if total_step % summary_steps == 0:
+                if total_step % self.SUMMARY_STEPS == 0:
                     writer.add_scalar('loss', loss_monitor.value, total_step)
 
             logging.info(log_string.format(epoch, loss_monitor.value))
@@ -102,9 +103,9 @@ class Model:
             val_loss_monitor.reset()
             val_metric_monitor.reset()
             for samples in dev_loader:
-                features = samples['features'].to(self.device)
+                inputs = samples['features'].to(self.device)
                 targets = samples['target'].to(self.device)
-                predictions = self.module(features)
+                predictions = self.module(inputs)
                 loss = self.criterion(predictions, targets)
                 l1loss = metric(predictions, targets)
 

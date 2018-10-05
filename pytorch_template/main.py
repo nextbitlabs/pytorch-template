@@ -30,8 +30,7 @@ class PyTorchTemplate:
         dataset = IngestDataset(root_dir, split, 'targets.csv',
                                 transform=transformation)
         loader = DataLoader(dataset, num_workers=os.cpu_count())
-        for _ in tqdm(loader, total=len(dataset),
-                      desc='Writing {} feature files'.format(split)):
+        for _ in tqdm(loader, desc='Writing {} feature files'.format(split)):
             pass
 
         #  TODO: remove metadata file if not needed (as here)
