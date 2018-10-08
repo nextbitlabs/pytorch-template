@@ -41,14 +41,11 @@ class Model:
             optimizer, step_size=epochs // 3, gamma=0.8)
 
         total_step = 0
-        loss_monitor = Monitor()
-        log_string = 'Epoch {:d} - Loss: {:.4f}'
         val_log_string = 'Validation after epoch {:d} - Loss: {:.4f} - L1: {:.4f}'
         best_checkpoint = ''
         best_val_metric = float('inf')  # TODO:update lower/upper bound
         for epoch in range(epochs):
             self.module.train()
-            loss_monitor.reset()
             scheduler.step()
             for samples in tqdm(loader, desc='Epoch {}'.format(epoch)):
                 optimizer.zero_grad()
@@ -62,11 +59,9 @@ class Model:
                 optimizer.step()
 
                 total_step += 1
-                loss_monitor.update(loss)
                 if total_step % self.SUMMARY_STEPS == 0:
-                    writer.add_scalar('loss', loss_monitor.value, total_step)
+                    writer.add_scalar('loss', loss.item(), total_step)
 
-            logging.info(log_string.format(epoch, loss_monitor.value))
             writer.add_scalar('lr', scheduler.get_lr()[0], total_step)
 
             if validation:
