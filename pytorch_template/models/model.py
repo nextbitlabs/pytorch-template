@@ -62,7 +62,7 @@ class Model:
                 optimizer.step()
 
                 total_step += 1
-                loss_monitor.update(loss, targets)
+                loss_monitor.update(loss)
                 if total_step % self.SUMMARY_STEPS == 0:
                     writer.add_scalar('loss', loss_monitor.value, total_step)
 
@@ -107,8 +107,8 @@ class Model:
                 loss = self.criterion(predictions, targets)
                 l1loss = metric(predictions, targets)
 
-                val_loss_monitor.update(loss, targets)
-                val_metric_monitor.update(l1loss, targets)
+                val_loss_monitor.update(loss)
+                val_metric_monitor.update(l1loss)
 
         return val_loss_monitor.value, val_metric_monitor.value
 

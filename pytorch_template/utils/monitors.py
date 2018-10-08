@@ -1,42 +1,21 @@
-from typing import Optional, Callable
-
 import torch
 
 
 class Monitor:
 
-    def __init__(self,
-                 target_condition: Optional[Callable] = None):
+    def __init__(self):
         self.total = 0
-        self.num_valid = 0
-        self.target_condition = target_condition
+        self.num_batches = 0
 
     @property
     def value(self) -> float:
-        return self.total / self.num_valid if self.num_valid else float('nan')
+        return self.total / self.num_batches if self.num_batches else float('nan')
 
     def update(self,
-               batch_total: torch.Tensor,
-               targets: torch.Tensor) -> None:
-        with torch.no_grad():
-            self.total += batch_total.item()
-            batch_valid = sum(self.target_condition(targets)).item() \
-                if self.target_condition else targets.shape[0]
-            self.num_valid += batch_valid
+               batch_mean: torch.Tensor) -> None:
+        self.total += batch_mean.item()
+        self.num_batches += 1
 
     def reset(self):
         self.total = 0
-        self.num_valid = 0
-
-
-class AccuracyMonitor(Monitor):
-
-    # noinspection PyTypeChecker
-    def update(self,
-               predictions: torch.Tensor,
-               targets: torch.Tensor) -> None:
-        with torch.no_grad():
-            self.total += sum(predictions == targets).item()
-            batch_valid = sum(self.target_condition(targets)).item() \
-                if self.target_condition else targets.shape[0]
-            self.num_valid += batch_valid
+        self.num_batches = 0
