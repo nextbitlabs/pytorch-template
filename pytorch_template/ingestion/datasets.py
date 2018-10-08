@@ -48,6 +48,8 @@ class NpyDataset(Dataset):
                  root_dir: str,
                  split: str,
                  transform: Optional[Callable[[Dict], Dict]] = None):
+        self._features_shape = None
+
         self.root_dir = os.path.expanduser(os.path.normpath(root_dir))
         self.split = split
         self.transform = transform
@@ -78,4 +80,6 @@ class NpyDataset(Dataset):
 
     @property
     def features_shape(self):
-        return self[0]['features'].shape
+        if self._features_shape is None:
+            self._features_shape = self[0]['features'].shape
+        return self._features_shape
