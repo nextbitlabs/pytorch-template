@@ -58,9 +58,9 @@ class CLI:
                             help='Initial learning rate')
 
         args = parser.parse_args(sys.argv[2:])
-        best_checkpoint_path = PyTorchTemplate.train(
+        best_checkpoint = PyTorchTemplate.train(
             args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr)
-        print('Best checkpoint saved at {}'.format(best_checkpoint_path))
+        print('Best checkpoint saved at {}'.format(best_checkpoint))
 
     @staticmethod
     def eval() -> None:

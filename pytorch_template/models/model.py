@@ -88,9 +88,9 @@ class Model:
             torch.save(self.module.state_dict(), checkpoint_filepath)
 
         writer.close()
-        best_checkpoint_path = os.path.join(
+        best_checkpoint = os.path.join(
             working_env, 'checkpoints', best_checkpoint)
-        return best_checkpoint_path
+        return best_checkpoint
 
     def eval(self,
              dev_loader: DataLoader) -> Tuple[float, float]:
@@ -98,10 +98,8 @@ class Model:
         val_metric_monitor = Monitor()
         metric = nn.L1Loss()  # TODO: update metrics
 
+        self.module.eval()
         with torch.no_grad():
-            self.module.eval()
-            val_loss_monitor.reset()
-            val_metric_monitor.reset()
             for samples in dev_loader:
                 inputs = samples['features'].to(self.device)
                 targets = samples['target'].to(self.device)
@@ -117,7 +115,7 @@ class Model:
     def predict(self,
                 sample: Dict[str, torch.Tensor]) -> float:
         features = sample['features'].to(self.device)
+        self.module.eval()
         with torch.no_grad():
-            self.module.eval()
             output = self.module(features).item()  # TODO: update if output is a vector
         return output

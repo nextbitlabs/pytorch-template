@@ -65,9 +65,9 @@ class PyTorchTemplate:
 
         module = LinearRegression(train_dataset.features_shape[-1])
         model = Model(module)
-        best_checkpoint_path = model.fit(
+        best_checkpoint = model.fit(
             working_env, train_loader, epochs, lr, dev_loader)
-        return best_checkpoint_path
+        return best_checkpoint
 
     @staticmethod
     def evaluate(checkpoint: str,
