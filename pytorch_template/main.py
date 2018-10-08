@@ -7,11 +7,10 @@ from typing import Tuple
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from torchvision import transforms
 from tqdm import tqdm
 
 from .ingestion.datasets import IngestDataset, NpyDataset
-from .ingestion.transforms import Normalize, ToFile, ToTensor
+from .ingestion.transforms import ToTensor
 from .models.linear import LinearRegression
 from .models.model import Model
 
@@ -22,16 +21,15 @@ class PyTorchTemplate:
     @staticmethod
     def ingest(root_dir: str,
                split: str) -> str:
-        # TODO: update transformations
-        normalize = Normalize(0, 1)
-        to_file = ToFile(os.path.join(root_dir, 'npy', split))
-        transformation = transforms.Compose([normalize, to_file])
+        # TODO: add transformations
 
-        dataset = IngestDataset(root_dir, split, 'targets.csv',
-                                transform=transformation)
+        dataset = IngestDataset(root_dir, split, 'targets.csv')
         loader = DataLoader(dataset, num_workers=os.cpu_count())
-        for _ in tqdm(loader, desc='Writing {} feature files'.format(split)):
-            pass
+        for sample in tqdm(loader, desc='Writing {} feature files'.format(split)):
+            # TODO: update path
+            output_path = os.path.join(root_dir, 'npy', split,
+                                       '{}.npy'.format(sample['filename']))
+            np.save(output_path, np.array([sample['features'], sample['target']]))
 
         #  TODO: remove metadata file if not needed (as here)
         metadata_path = os.path.join(root_dir, 'npy', split, 'metadata.pkl')
