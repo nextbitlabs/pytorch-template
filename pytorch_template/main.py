@@ -25,10 +25,14 @@ class PyTorchTemplate:
 
         dataset = IngestDataset(root_dir, split, 'targets.csv')
         loader = DataLoader(dataset, num_workers=os.cpu_count())
+
+        # TODO: update path
+        output_dir = os.path.join(root_dir, 'npy', split)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         for sample in tqdm(loader, desc='Writing {} feature files'.format(split)):
-            # TODO: update path
-            output_path = os.path.join(root_dir, 'npy', split,
-                                       '{}.npy'.format(sample['filename']))
+            output_path = os.path.join(
+                output_dir, '{}.npy'.format(sample['filename']))
             np.save(output_path, np.array([sample['features'], sample['target']]))
 
         #  TODO: remove metadata file if not needed (as here)
