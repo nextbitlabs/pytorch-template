@@ -16,6 +16,7 @@ class LinearRegression(nn.Module):
 
     def forward(self,
                 x: torch.Tensor) -> torch.Tensor:
+        # noinspection PyUnresolvedReferences
         prediction = torch.squeeze(self.fc(x))
         return prediction
 
