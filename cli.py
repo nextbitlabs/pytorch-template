@@ -56,10 +56,14 @@ class CLI:
                             help='Number of epochs')
         parser.add_argument('--lr', type=float, default=0.1,
                             help='Initial learning rate')
+        parser.add_argument('-s', '--silent', action='store_true', help='Less verbose logging')
+        parser.add_argument('--debug', action='store_true',
+                            help='Log everything for debugging purpose')
 
         args = parser.parse_args(sys.argv[2:])
         best_checkpoint = PyTorchTemplate.train(
-            args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr)
+            args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr,
+            args.silent, args.debug)
         print('Best checkpoint saved at {}'.format(best_checkpoint))
 
     @staticmethod

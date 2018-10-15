@@ -46,8 +46,10 @@ class PyTorchTemplate:
               output_dir: str,
               batch_size: int,
               epochs: int,
-              lr: float) -> str:
-        working_env = PyTorchTemplate._create_working_env(output_dir)
+              lr: float,
+              silent: bool,
+              debug: bool) -> str:
+        working_env = PyTorchTemplate._create_working_env(output_dir, silent, debug)
 
         logging.info('Batch size: {}'.format(batch_size))
         logging.info('Learning rate: {}'.format(lr))
@@ -105,13 +107,13 @@ class PyTorchTemplate:
         return prediction
 
     @staticmethod
-    def _create_working_env(output_dir: str) -> str:
+    def _create_working_env(output_dir: str, silent: bool, debug: bool) -> str:
         working_env = os.path.join(output_dir, 'runs', str(int(time.time())))
         os.makedirs(os.path.join(working_env, 'checkpoints'))
         os.makedirs(os.path.join(working_env, 'logs'))
 
         logger = logging.getLogger()
-        logger.setLevel(logging.INFO)
+        logger.setLevel(logging.DEBUG if debug else logging.WARNING if silent else logging.INFO)
         log_formatter = logging.Formatter('%(asctime)s | %(message)s')
         file_handler = logging.FileHandler(os.path.join(working_env, 'logs',
                                                         'train_info.log'))
