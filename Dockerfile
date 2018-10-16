@@ -1,4 +1,5 @@
-FROM nvcr.io/nvidia/pytorch:18.09-py3
+# TODO: update version
+FROM nvcr.io/nvidia/pytorch:18.08-py3
 
 RUN apt-get -y update
 RUN apt-get -y install screen htop

@@ -24,7 +24,7 @@ class PyTorchTemplate:
         # TODO: add transformations
 
         dataset = IngestDataset(root_dir, split, 'targets.csv')
-        loader = DataLoader(dataset, num_workers=os.cpu_count())
+        loader = DataLoader(dataset, num_workers=os.cpu_count(), collate_fn=lambda x: x[0])
 
         # TODO: update path
         output_dir = os.path.join(root_dir, 'npy', split)
