@@ -21,6 +21,8 @@ class PyTorchTemplate:
     @staticmethod
     def ingest(root_dir: str,
                split: str) -> str:
+        PyTorchTemplate._set_logger()
+
         # TODO: add transformations
 
         dataset = IngestDataset(root_dir, split, 'targets.csv')
@@ -49,7 +51,8 @@ class PyTorchTemplate:
               lr: float,
               silent: bool,
               debug: bool) -> str:
-        working_env = PyTorchTemplate._create_working_env(output_dir, silent, debug)
+        PyTorchTemplate._set_logger(silent, debug)
+        working_env = PyTorchTemplate._create_working_env(output_dir)
 
         logging.info('Batch size: {}'.format(batch_size))
         logging.info('Learning rate: {}'.format(lr))
@@ -96,6 +99,8 @@ class PyTorchTemplate:
     @staticmethod
     def test(checkpoint: str,
              data_path: str) -> float:
+        PyTorchTemplate._set_logger()
+
         with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
             hyperparams = pickle.load(f)
         module = LinearRegression(**hyperparams)
@@ -110,20 +115,24 @@ class PyTorchTemplate:
         return prediction
 
     @staticmethod
-    def _create_working_env(output_dir: str, silent: bool, debug: bool) -> str:
+    def _set_logger(silent: bool = False,
+                    debug: bool = False) -> None:
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG if debug else logging.WARNING if silent else logging.INFO)
+        log_formatter = logging.Formatter('%(asctime)s | %(message)s')
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(log_formatter)
+        logger.addHandler(console_handler)
+
+    @staticmethod
+    def _create_working_env(output_dir: str) -> str:
         working_env = os.path.join(output_dir, 'runs', str(int(time.time())))
         os.makedirs(os.path.join(working_env, 'checkpoints'))
         os.makedirs(os.path.join(working_env, 'logs'))
 
         logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG if debug else logging.WARNING if silent else logging.INFO)
-        log_formatter = logging.Formatter('%(asctime)s | %(message)s')
-        file_handler = logging.FileHandler(os.path.join(working_env, 'logs',
-                                                        'train_info.log'))
-        file_handler.setFormatter(log_formatter)
+        file_handler = logging.FileHandler(
+            os.path.join(working_env, 'logs', 'train_info.log'))
         logger.addHandler(file_handler)
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(log_formatter)
-        logger.addHandler(console_handler)
 
         return working_env
