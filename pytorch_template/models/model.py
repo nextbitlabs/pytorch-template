@@ -34,8 +34,8 @@ class Model:
 
     def __init__(self,
                  module: nn.Module):
-        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self.module = module.to(self.device)
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.module = module.to(device)
         self.criterion = nn.MSELoss()  # TODO: update
 
     def fit(self,
@@ -69,8 +69,12 @@ class Model:
             for samples in tqdm(loader, desc='Epoch {}'.format(epoch)):
                 optimizer.zero_grad()
 
-                inputs = samples['features'].to(self.device)
-                targets = samples['target'].to(self.device)
+                inputs = samples['features']
+                targets = samples['target']
+                if torch.cuda.is_available():
+                    inputs = inputs.cuda(non_blocking=True)
+                    targets = targets.cuda(non_blocking=True)
+
                 predictions = self.module(inputs)
                 loss = self.criterion(predictions, targets)
 
@@ -115,8 +119,12 @@ class Model:
         self.module.eval()
         with torch.no_grad():
             for samples in dev_loader:
-                inputs = samples['features'].to(self.device)
-                targets = samples['target'].to(self.device)
+                inputs = samples['features']
+                targets = samples['target']
+                if torch.cuda.is_available():
+                    inputs = inputs.cuda(non_blocking=True)
+                    targets = targets.cuda(non_blocking=True)
+
                 predictions = self.module(inputs)
                 loss = self.criterion(predictions, targets)
                 l1loss = metric(predictions, targets)
@@ -128,7 +136,10 @@ class Model:
 
     def predict(self,
                 sample: Dict[str, torch.Tensor]) -> float:
-        features = sample['features'].to(self.device)
+        features = sample['features']
+        if torch.cuda.is_available():
+            features = features.cuda(non_blocking=True)
+
         self.module.eval()
         with torch.no_grad():
             output = self.module(features).item()  # TODO: update if output is a vector

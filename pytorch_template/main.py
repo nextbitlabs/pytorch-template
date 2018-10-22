@@ -57,13 +57,15 @@ class PyTorchTemplate:
         to_tensor = ToTensor()
 
         train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
-        train_loader = DataLoader(train_dataset, batch_size=batch_size,
-                                  shuffle=True, num_workers=os.cpu_count())
+        train_loader = DataLoader(
+            train_dataset, batch_size=batch_size, shuffle=True,
+            num_workers=os.cpu_count(), pin_memory=True)
 
         if os.path.isdir(os.path.join(npy_dir, 'dev')):
             dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
-            dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
-                                    shuffle=False, num_workers=os.cpu_count())
+            dev_loader = DataLoader(
+                dev_dataset, batch_size=batch_size, shuffle=False,
+                num_workers=os.cpu_count(), pin_memory=True)
         else:
             dev_loader = None
 
@@ -78,8 +80,9 @@ class PyTorchTemplate:
                  npy_dir: str,
                  batch_size: int) -> Tuple[float, float]:
         dev_dataset = NpyDataset(npy_dir, 'dev', transform=ToTensor())
-        dev_loader = DataLoader(dev_dataset, batch_size=batch_size,
-                                shuffle=False, num_workers=os.cpu_count())
+        dev_loader = DataLoader(
+            dev_dataset, batch_size=batch_size, shuffle=False,
+            num_workers=os.cpu_count(), pin_memory=True)
 
         with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
             hyperparams = pickle.load(f)
