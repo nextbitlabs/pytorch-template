@@ -1,6 +1,7 @@
 import logging
 import os
 import pickle
+import shutil
 import time
 from typing import Tuple
 
@@ -69,8 +70,10 @@ class PyTorchTemplate:
 
         # TODO: update path
         output_dir = os.path.join(root_dir, 'npy', split)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if os.path.exists(output_dir):
+            shutil.rmtree(output_dir, ignore_errors=True)
+        os.makedirs(output_dir)
+
         for sample in tqdm(loader, desc='Writing {} feature files'.format(split)):
             output_path = os.path.join(
                 output_dir, '{}.npy'.format(sample['filename']))
