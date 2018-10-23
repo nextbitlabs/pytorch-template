@@ -10,6 +10,7 @@ class LinearRegression(nn.Module):
         # TODO: update model layers
         self.fc = nn.Linear(features_size, 1)
         self.hyperparams = {
+            'module_name': 'LinearRegression',
             'features_size': features_size
         }
         self._initialize_weights()

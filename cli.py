@@ -16,10 +16,11 @@ class CLI:
                    '\n'
                    'ingest      Ingest data\n'
                    'train       Train the model\n'
+                   'restore     Restore training from a checkpoint\n'
                    'eval        Evaluate the model\n'
                    'test        Test the model\n'))
         parser.add_argument('command', type=str, help='Sub-command to run',
-                            choices=['ingest', 'train', 'eval', 'test'])
+                            choices=('ingest', 'train', 'restore', 'eval', 'test'))
 
         args = parser.parse_args(sys.argv[1:2])
         command = args.command.replace('-', '_')
@@ -56,7 +57,8 @@ class CLI:
                             help='Number of epochs')
         parser.add_argument('--lr', type=float, default=0.1,
                             help='Initial learning rate')
-        parser.add_argument('-s', '--silent', action='store_true', help='Less verbose logging')
+        parser.add_argument('-s', '--silent', action='store_true',
+                            help='Less verbose logging')
         parser.add_argument('--debug', action='store_true',
                             help='Log everything for debugging purpose')
 
@@ -64,6 +66,33 @@ class CLI:
         best_checkpoint = PyTorchTemplate.train(
             args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr,
             args.silent, args.debug)
+        print('Best checkpoint saved at {}'.format(best_checkpoint))
+
+    @staticmethod
+    def restore() -> None:
+        #  TODO: update description coherently with usage in __init__
+        parser = argparse.ArgumentParser(
+            description='Restore training from a checkpoint')
+        #  TODO: update parameters and default values
+        parser.add_argument('npy_dir', type=str, help='Npy directory')
+        parser.add_argument('checkpoint', type=str, help='Checkpoint path')
+        parser.add_argument('--output-dir', type=str, help='Output directory',
+                            default='./')
+        parser.add_argument('--batch-size', type=int, default=20,
+                            help='Batch size')
+        parser.add_argument('--epochs', type=int, default=40,
+                            help='Number of epochs')
+        parser.add_argument('--lr', type=float, default=0.1,
+                            help='Initial learning rate')
+        parser.add_argument('-s', '--silent', action='store_true',
+                            help='Less verbose logging')
+        parser.add_argument('--debug', action='store_true',
+                            help='Log everything for debugging purpose')
+
+        args = parser.parse_args(sys.argv[2:])
+        best_checkpoint = PyTorchTemplate.restore(
+            args.npy_dir, args.checkpoint, args.output_dir, args.batch_size,
+            args.epochs, args.lr, args.silent, args.debug)
         print('Best checkpoint saved at {}'.format(best_checkpoint))
 
     @staticmethod
