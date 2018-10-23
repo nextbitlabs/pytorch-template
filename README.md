@@ -79,6 +79,7 @@ The available commands are:
 - `ingest`: preprocess raw data and export it in a suitable format for model
 training;
 - `train`: train the deep learning model on ingested data;
+- `restore`: restore the training from a saved checkpoint;
 - `eval`: evaluate the model on ingested validation data;
 - `test`: produce model output on a single raw data sample.
 
@@ -163,12 +164,12 @@ to console at the end of the computation.
 #### Examples
 
 The command has many optional training-related parameters commonly tuned by the 
-experimenter,
-like `batch-size`, `epochs`, `lr`. Logging options are also available: `silent` to log only warning 
+experimenter, like `batch-size`, `epochs`, `lr`. 
+Logging options are also available: `silent` to log only warning 
 messages, and `debug` for a more verbose logging. 
 
-The most basic training can be performed specifying just the directory containing the dataset,
-already split in `train` (compulsory) and `dev` (optional) folders
+The most basic training can be performed specifying just the directory containing
+the dataset, already split in `train` (compulsory) and `dev` (optional) folders
 using the default values for the other parameters.
 ```
 python3.6 cli.py train data/npy
@@ -188,6 +189,43 @@ python3.6 cli.py train \
 For more details on the usage you can access the help page with the command
 ```
 python3.6 cli.py train --help
+```
+
+### Command `restore`
+
+When the model has not converged at the end of the training phase, it
+can be useful to restore it from the last saved checkpoint and that is exactly
+the role of this command.
+
+#### Examples
+
+
+The command has the same optional parameters of the `train` command.
+It just has an additional compulsory parameter: the path to the checkpoint model
+to be restored.
+
+The most basic restored training can be performed specifying just the directory
+containing the dataset, already split in `train` (compulsory) and `dev` (optional)
+folders, and the checkpoint path using the default values for the other parameters.
+```
+python3.6 cli.py restore data/npy runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt
+```
+
+An equivalent form of the previous command with all the default values
+manually specified is:
+```
+python3.6 cli.py restore \
+    data/npy \
+    runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
+    --output-dir . \
+    --batch-size 20 \
+    --epochs 40 \
+    --lr 0.1
+```
+
+For more details on the usage you can access the help page with the command
+```
+python3.6 cli.py restore --help
 ```
 
 ### Command `eval`

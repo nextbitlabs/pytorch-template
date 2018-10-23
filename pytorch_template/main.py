@@ -19,6 +19,45 @@ from .models.model import Model
 class PyTorchTemplate:
 
     @staticmethod
+    def _set_logger(silent: bool = False,
+                    debug: bool = False) -> None:
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG if debug else logging.WARNING if silent else logging.INFO)
+        log_formatter = logging.Formatter('%(asctime)s | %(message)s')
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(log_formatter)
+        logger.addHandler(console_handler)
+
+    @staticmethod
+    def _create_working_env(output_dir: str) -> str:
+        working_env = os.path.join(output_dir, 'runs', str(int(time.time())))
+        os.makedirs(os.path.join(working_env, 'checkpoints'))
+        os.makedirs(os.path.join(working_env, 'logs'))
+
+        logger = logging.getLogger()
+        file_handler = logging.FileHandler(
+            os.path.join(working_env, 'logs', 'train_info.log'))
+        logger.addHandler(file_handler)
+
+        return working_env
+
+    @staticmethod
+    def _load_model(checkpoint: str) -> Model:
+        with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
+            hyperparams = pickle.load(f)
+
+        if LinearRegression.__name__ == hyperparams['module_name']:  # TODO: update module
+            module_class = LinearRegression  # TODO: update module
+        else:
+            raise ValueError('Checkpoint of unsupported module')
+        del hyperparams['module_name']
+
+        module = module_class(**hyperparams)
+        module.load_state_dict(torch.load(checkpoint))
+        model = Model(module)
+        return model
+
+    @staticmethod
     def ingest(root_dir: str,
                split: str) -> str:
         PyTorchTemplate._set_logger()
@@ -57,7 +96,7 @@ class PyTorchTemplate:
         logging.info('Batch size: {}'.format(batch_size))
         logging.info('Learning rate: {}'.format(lr))
 
-        to_tensor = ToTensor()
+        to_tensor = ToTensor()  # TODO: update transformations
 
         train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
         train_loader = DataLoader(
@@ -79,20 +118,52 @@ class PyTorchTemplate:
         return best_checkpoint
 
     @staticmethod
+    def restore(npy_dir: str,
+                checkpoint: str,
+                output_dir: str,
+                batch_size: int,
+                epochs: int,
+                lr: float,
+                silent: bool,
+                debug: bool) -> str:
+        PyTorchTemplate._set_logger(silent, debug)
+        working_env = PyTorchTemplate._create_working_env(output_dir)
+
+        logging.info('Checkpoint: {}'.format(checkpoint))
+        logging.info('Batch size: {}'.format(batch_size))
+        logging.info('Learning rate: {}'.format(lr))
+
+        to_tensor = ToTensor()  # TODO: update transformations
+
+        train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
+        train_loader = DataLoader(
+            train_dataset, batch_size=batch_size, shuffle=True,
+            num_workers=os.cpu_count(), pin_memory=True)
+
+        if os.path.isdir(os.path.join(npy_dir, 'dev')):
+            dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
+            dev_loader = DataLoader(
+                dev_dataset, batch_size=batch_size, shuffle=False,
+                num_workers=os.cpu_count(), pin_memory=True)
+        else:
+            dev_loader = None
+
+        model = PyTorchTemplate._load_model(checkpoint)
+        best_checkpoint = model.fit(
+            working_env, train_loader, epochs, lr, dev_loader)
+        return best_checkpoint
+
+    @staticmethod
     def evaluate(checkpoint: str,
                  npy_dir: str,
                  batch_size: int) -> Tuple[float, float]:
+        # TODO: update transformations
         dev_dataset = NpyDataset(npy_dir, 'dev', transform=ToTensor())
         dev_loader = DataLoader(
             dev_dataset, batch_size=batch_size, shuffle=False,
             num_workers=os.cpu_count(), pin_memory=True)
 
-        with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
-            hyperparams = pickle.load(f)
-        module = LinearRegression(**hyperparams)
-        module.load_state_dict(torch.load(checkpoint))
-
-        model = Model(module)
+        model = PyTorchTemplate._load_model(checkpoint)
         val_loss, val_metric = model.eval(dev_loader)
         return val_loss, val_metric
 
@@ -100,39 +171,10 @@ class PyTorchTemplate:
     def test(checkpoint: str,
              data_path: str) -> float:
         PyTorchTemplate._set_logger()
-
-        with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
-            hyperparams = pickle.load(f)
-        module = LinearRegression(**hyperparams)
-        module.load_state_dict(torch.load(checkpoint))
-        model = Model(module)
-
+        model = PyTorchTemplate._load_model(checkpoint)
         to_tensor = ToTensor()  # TODO: update transformations
 
         features = {'features': np.load(data_path).astype(np.float32)}  # TODO: update data loading
         features = to_tensor(features)
         prediction = model.predict(features)
         return prediction
-
-    @staticmethod
-    def _set_logger(silent: bool = False,
-                    debug: bool = False) -> None:
-        logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG if debug else logging.WARNING if silent else logging.INFO)
-        log_formatter = logging.Formatter('%(asctime)s | %(message)s')
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(log_formatter)
-        logger.addHandler(console_handler)
-
-    @staticmethod
-    def _create_working_env(output_dir: str) -> str:
-        working_env = os.path.join(output_dir, 'runs', str(int(time.time())))
-        os.makedirs(os.path.join(working_env, 'checkpoints'))
-        os.makedirs(os.path.join(working_env, 'logs'))
-
-        logger = logging.getLogger()
-        file_handler = logging.FileHandler(
-            os.path.join(working_env, 'logs', 'train_info.log'))
-        logger.addHandler(file_handler)
-
-        return working_env
