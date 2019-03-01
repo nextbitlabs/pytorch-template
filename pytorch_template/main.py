@@ -3,6 +3,7 @@ import os
 import pickle
 import shutil
 import time
+import platform
 from typing import Tuple
 
 import numpy as np
@@ -14,6 +15,11 @@ from .ingestion.datasets import IngestDataset, NpyDataset
 from .ingestion.transforms import ToTensor
 from .models.linear import LinearRegression
 from .models.model import Model
+
+if platform.system() == 'Windows':
+    num_workers = 0
+else:
+    num_workers = os.cpu_count()
 
 
 # TODO: update class name
@@ -66,7 +72,7 @@ class PyTorchTemplate:
         # TODO: add transformations
 
         dataset = IngestDataset(root_dir, split, 'targets.csv')
-        loader = DataLoader(dataset, num_workers=os.cpu_count(), collate_fn=lambda x: x[0])
+        loader = DataLoader(dataset, num_workers=num_workers, collate_fn=lambda x: x[0])
 
         # TODO: update path
         output_dir = os.path.join(root_dir, 'npy', split)
@@ -104,13 +110,13 @@ class PyTorchTemplate:
         train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
         train_loader = DataLoader(
             train_dataset, batch_size=batch_size, shuffle=True,
-            num_workers=os.cpu_count(), pin_memory=True)
+            num_workers=num_workers, pin_memory=True)
 
         if os.path.isdir(os.path.join(npy_dir, 'dev')):
             dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
             dev_loader = DataLoader(
                 dev_dataset, batch_size=batch_size, shuffle=False,
-                num_workers=os.cpu_count(), pin_memory=True)
+                num_workers=num_workers, pin_memory=True)
         else:
             dev_loader = None
 
@@ -141,13 +147,13 @@ class PyTorchTemplate:
         train_dataset = NpyDataset(npy_dir, 'train', transform=to_tensor)
         train_loader = DataLoader(
             train_dataset, batch_size=batch_size, shuffle=True,
-            num_workers=os.cpu_count(), pin_memory=True)
+            num_workers=num_workers, pin_memory=True)
 
         if os.path.isdir(os.path.join(npy_dir, 'dev')):
             dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
             dev_loader = DataLoader(
                 dev_dataset, batch_size=batch_size, shuffle=False,
-                num_workers=os.cpu_count(), pin_memory=True)
+                num_workers=num_workers, pin_memory=True)
         else:
             dev_loader = None
 
@@ -164,7 +170,7 @@ class PyTorchTemplate:
         dev_dataset = NpyDataset(npy_dir, 'dev', transform=ToTensor())
         dev_loader = DataLoader(
             dev_dataset, batch_size=batch_size, shuffle=False,
-            num_workers=os.cpu_count(), pin_memory=True)
+            num_workers=num_workers, pin_memory=True)
 
         model = PyTorchTemplate._load_model(checkpoint)
         val_loss, val_metric = model.eval(dev_loader)
