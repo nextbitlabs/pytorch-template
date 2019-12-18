@@ -1,1 +1,10 @@
-{}
+{
+  "extends": [
+    "config:base",
+    ":assignAndReview(lgrementieri)"
+  ],
+  "pip_setup": {
+    "enabled": true
+  }
+}
+
