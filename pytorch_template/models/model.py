@@ -3,10 +3,10 @@ import os
 import pickle
 from typing import Optional, Tuple, Dict
 
-import tensorboardX
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from ..utils.monitors import Monitor
@@ -44,7 +44,7 @@ class Model:
             epochs: int,
             lr: float,
             dev_loader: Optional[DataLoader] = None) -> str:
-        writer = tensorboardX.SummaryWriter(os.path.join(working_env, 'logs'))
+        writer = SummaryWriter(os.path.join(working_env, 'logs'))
         with open(os.path.join(working_env, 'checkpoints', 'hyperparams.pkl'), 'wb') as f:
             pickle.dump(self.module.hyperparams, f)
 
