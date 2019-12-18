@@ -2,7 +2,7 @@
 
 # TODO: delete this template-specific file
 
-import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -15,9 +15,10 @@ VALIDATION_SET_SIZE = 20
 TEST_SET_SIZE = 20
 
 if __name__ == '__main__':
-    os.makedirs(os.path.join('data', 'train'), exist_ok=True)
-    os.makedirs(os.path.join('data', 'dev'), exist_ok=True)
-    os.makedirs(os.path.join('data', 'test'), exist_ok=True)
+
+    Path('data').joinpath('train').mkdir(parents=True, exist_ok=True)
+    Path('data').joinpath('dev').mkdir(parents=True, exist_ok=True)
+    Path('data').joinpath('test').mkdir(parents=True, exist_ok=True)
 
     training_set = np.random.rand(TRAINING_SET_SIZE, FEATURE_SIZE)
     validation_set = np.random.rand(VALIDATION_SET_SIZE, FEATURE_SIZE)
@@ -30,16 +31,16 @@ if __name__ == '__main__':
     dataframe.index.name = 'filepath'
 
     for i, features in enumerate(training_set):
-        filename = os.path.join('train', 'train_{:03d}.npy'.format(i))
-        np.save(os.path.join('data', filename), features)
+        filename = Path('train').joinpath('train_{:03d}.npy'.format(i))
+        np.save(Path('data').joinpath(filename), features)
         dataframe.loc[filename] = training_targets[i]
 
     for i, features in enumerate(validation_set):
-        filename = os.path.join('dev', 'dev_{:03d}.npy'.format(i))
-        np.save(os.path.join('data', filename), features)
+        filename = Path('dev').joinpath('dev_{:03d}.npy'.format(i))
+        np.save(Path('data').joinpath(filename), features)
         dataframe.loc[filename] = validation_targets[i]
 
     for i, features in enumerate(test_set):
-        np.save(os.path.join('data', 'test', 'test_{:03d}.npy'.format(i)), features)
+        np.save(Path('data').joinpath('test', 'test_{:03d}.npy'.format(i)), features)
 
-    dataframe.to_csv(os.path.join('data', 'targets.csv'), float_format='%.3f')
+    dataframe.to_csv(Path('data').joinpath('targets.csv'), float_format='%.3f')

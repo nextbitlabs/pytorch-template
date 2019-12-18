@@ -1,14 +1,14 @@
-import os
 import re
 from codecs import open
+from pathlib import Path
 
 from setuptools import setup, find_packages
 
-here = os.path.abspath(os.path.dirname(__file__))
+here = Path.resolve(Path(__file__).parent)
 
 
 def read(*parts):
-    with open(os.path.join(here, *parts), 'r') as fp:
+    with open(here.joinpath(*parts), 'r') as fp:
         return fp.read()
 
 
@@ -21,7 +21,7 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(here.joinpath('README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(

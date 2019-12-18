@@ -1,6 +1,6 @@
 import logging
-import os
 import pickle
+from pathlib import Path
 from typing import Optional, Tuple, Dict
 
 import torch
@@ -44,8 +44,9 @@ class Model:
             epochs: int,
             lr: float,
             dev_loader: Optional[DataLoader] = None) -> str:
-        writer = SummaryWriter(os.path.join(working_env, 'logs'))
-        with open(os.path.join(working_env, 'checkpoints', 'hyperparams.pkl'), 'wb') as f:
+        working_env = Path(working_env)
+        writer = SummaryWriter(working_env.joinpath('logs'))
+        with open(working_env.joinpath('checkpoints', 'hyperparams.pkl'), 'wb') as f:
             pickle.dump(self.module.hyperparams, f)
 
         validation = dev_loader is not None
@@ -101,13 +102,11 @@ class Model:
                 checkpoint_filename = 'model-{:03d}.ckpt'.format(epoch)
                 best_checkpoint = checkpoint_filename
 
-            checkpoint_filepath = os.path.join(
-                working_env, 'checkpoints', checkpoint_filename)
+            checkpoint_filepath = working_env.joinpath('checkpoints', checkpoint_filename)
             torch.save(self.module.state_dict(), checkpoint_filepath)
 
         writer.close()
-        best_checkpoint = os.path.join(
-            working_env, 'checkpoints', best_checkpoint)
+        best_checkpoint = working_env.joinpath('checkpoints', best_checkpoint)
         return best_checkpoint
 
     def eval(self,
