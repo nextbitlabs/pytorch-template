@@ -67,7 +67,7 @@ class NpyDataset(Dataset):
         # TODO: update return types
         filepath = self.filepaths[idx]
         # TODO: update
-        features, target = np.load(filepath)
+        features, target = np.load(filepath, allow_pickle=True)
         sample = {
             'features': features.astype(np.float32),
             'target': target

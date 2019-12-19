@@ -39,7 +39,7 @@ class PyTorchTemplate:
     @staticmethod
     def _create_working_env(output_dir: str) -> str:
         working_env = Path(output_dir).joinpath('runs', str(int(time.time())))
-        Path.mkdir(working_env.joinpath('checkpoints'))
+        Path.mkdir(working_env.joinpath('checkpoints'), parents=True)
         Path.mkdir(working_env.joinpath('logs'))
 
         logger = logging.getLogger()
@@ -79,7 +79,7 @@ class PyTorchTemplate:
         output_dir = Path(root_dir).joinpath('npy', Path(split))
         if Path.exists(output_dir):
             shutil.rmtree(output_dir, ignore_errors=True)
-        output_dir.mkdir()
+        output_dir.mkdir(parents=True)
 
         for sample in tqdm(loader, desc='Writing {} feature files'.format(split)):
             output_path = output_dir.joinpath('{}.npy'.format(sample['filename']))
