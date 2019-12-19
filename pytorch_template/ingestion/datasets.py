@@ -18,7 +18,7 @@ class IngestDataset(Dataset):
         self.split = split
         self.transform = transform
 
-        self.dataframe = pd.read_csv(self.root_dir.joinpath(targets_file), index_col=0)
+        self.dataframe = pd.read_csv(self.root_dir / targets_file, index_col=0)
         self.dataframe = self.dataframe.filter(regex='^{}'.format(split), axis=0)
 
     def __len__(self) -> int:
@@ -27,7 +27,7 @@ class IngestDataset(Dataset):
     def __getitem__(self,
                     idx: int) -> Dict[str, Union[np.array, float, str]]:
         # TODO: update return types
-        filepath = self.root_dir.joinpath(self.dataframe.index[idx])
+        filepath = self.root_dir / self.dataframe.index[idx]
         # TODO: update
         sample = {
             'features': np.load(filepath),
@@ -54,7 +54,7 @@ class NpyDataset(Dataset):
         self.split = split
         self.transform = transform
 
-        split_path = self.root_dir.joinpath(self.split)
+        split_path = self.root_dir / self.split
         self.filepaths = tuple(sorted(
             e for e in split_path.iterdir() if e.is_file()
             if e.name.rsplit('.', 1)[1].lower() in NpyDataset.ACCEPTED_EXTENSIONS))

@@ -45,8 +45,8 @@ class Model:
             lr: float,
             dev_loader: Optional[DataLoader] = None) -> str:
         working_env = Path(working_env)
-        writer = SummaryWriter(working_env.joinpath('logs'))
-        with open(working_env.joinpath('checkpoints', 'hyperparams.pkl'), 'wb') as f:
+        writer = SummaryWriter(working_env / 'logs')
+        with open(working_env / 'checkpoints' / 'hyperparams.pkl', 'wb') as f:
             pickle.dump(self.module.hyperparams, f)
 
         validation = dev_loader is not None
@@ -66,7 +66,7 @@ class Model:
         best_val_metric = float('inf')  # TODO:update lower/upper bound
         for epoch in range(epochs):
             self.module.train()
-            scheduler.step()
+
             for samples in tqdm(loader, desc='Epoch {}'.format(epoch)):
                 optimizer.zero_grad()
 
@@ -102,11 +102,13 @@ class Model:
                 checkpoint_filename = 'model-{:03d}.ckpt'.format(epoch)
                 best_checkpoint = checkpoint_filename
 
-            checkpoint_filepath = working_env.joinpath('checkpoints', checkpoint_filename)
+            scheduler.step()
+
+            checkpoint_filepath = working_env / 'checkpoints' / checkpoint_filename
             torch.save(self.module.state_dict(), checkpoint_filepath)
 
         writer.close()
-        best_checkpoint = working_env.joinpath('checkpoints', best_checkpoint)
+        best_checkpoint = working_env / 'checkpoints' / best_checkpoint
         return best_checkpoint
 
     def eval(self,
