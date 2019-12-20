@@ -1,9 +1,10 @@
 import logging
 import os
 import pickle
+import platform
 import shutil
 import time
-import platform
+from pathlib import Path
 from typing import Tuple
 
 import numpy as np
@@ -37,20 +38,20 @@ class PyTorchTemplate:
 
     @staticmethod
     def _create_working_env(output_dir: str) -> str:
-        working_env = os.path.join(output_dir, 'runs', str(int(time.time())))
-        os.makedirs(os.path.join(working_env, 'checkpoints'))
-        os.makedirs(os.path.join(working_env, 'logs'))
+        working_env = Path(output_dir) / 'runs' / str(int(time.time()))
+        Path.mkdir(working_env / 'checkpoints', parents=True)
+        Path.mkdir(working_env / 'logs')
 
         logger = logging.getLogger()
         file_handler = logging.FileHandler(
-            os.path.join(working_env, 'logs', 'train_info.log'))
+            working_env / 'logs' / 'train_info.log')
         logger.addHandler(file_handler)
 
         return working_env
 
     @staticmethod
     def _load_model(checkpoint: str) -> Model:
-        with open(os.path.join(os.path.dirname(checkpoint), 'hyperparams.pkl'), 'rb') as f:
+        with open(Path(checkpoint).parent / 'hyperparams.pkl', 'rb') as f:
             hyperparams = pickle.load(f)
 
         if LinearRegression.__name__ == hyperparams['module_name']:  # TODO: update module
@@ -75,18 +76,17 @@ class PyTorchTemplate:
         loader = DataLoader(dataset, num_workers=num_workers, collate_fn=lambda x: x[0])
 
         # TODO: update path
-        output_dir = os.path.join(root_dir, 'npy', split)
-        if os.path.exists(output_dir):
+        output_dir = Path(root_dir) / 'npy' / Path(split)
+        if output_dir.exists():
             shutil.rmtree(output_dir, ignore_errors=True)
-        os.makedirs(output_dir)
+        output_dir.mkdir(parents=True)
 
         for sample in tqdm(loader, desc='Writing {} feature files'.format(split)):
-            output_path = os.path.join(
-                output_dir, '{}.npy'.format(sample['filename']))
+            output_path = output_dir / '{}.npy'.format(sample['filename'])
             np.save(output_path, np.array([sample['features'], sample['target']]))
 
         #  TODO: remove metadata file if not needed (as here)
-        metadata_path = os.path.join(root_dir, 'npy', split, 'metadata.pkl')
+        metadata_path = Path(root_dir) / 'npy' / split / 'metadata.pkl'
         with open(metadata_path, 'wb') as f:
             pickle.dump({'num_files': len(dataset)}, f)
         return metadata_path
@@ -112,7 +112,7 @@ class PyTorchTemplate:
             train_dataset, batch_size=batch_size, shuffle=True,
             num_workers=num_workers, pin_memory=True)
 
-        if os.path.isdir(os.path.join(npy_dir, 'dev')):
+        if (Path(npy_dir) / 'dev').is_dir():
             dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
             dev_loader = DataLoader(
                 dev_dataset, batch_size=batch_size, shuffle=False,
@@ -149,7 +149,7 @@ class PyTorchTemplate:
             train_dataset, batch_size=batch_size, shuffle=True,
             num_workers=num_workers, pin_memory=True)
 
-        if os.path.isdir(os.path.join(npy_dir, 'dev')):
+        if (Path(npy_dir) / 'dev').is_dir():
             dev_dataset = NpyDataset(npy_dir, 'dev', transform=to_tensor)
             dev_loader = DataLoader(
                 dev_dataset, batch_size=batch_size, shuffle=False,

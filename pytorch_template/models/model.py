@@ -1,12 +1,12 @@
 import logging
-import os
 import pickle
+from pathlib import Path
 from typing import Optional, Tuple, Dict
 
-import tensorboardX
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from ..utils.monitor import Monitor
@@ -44,8 +44,9 @@ class Model:
             epochs: int,
             lr: float,
             dev_loader: Optional[DataLoader] = None) -> str:
-        writer = tensorboardX.SummaryWriter(os.path.join(working_env, 'logs'))
-        with open(os.path.join(working_env, 'checkpoints', 'hyperparams.pkl'), 'wb') as f:
+        working_env = Path(working_env)
+        writer = SummaryWriter(working_env / 'logs')
+        with open(working_env / 'checkpoints' / 'hyperparams.pkl', 'wb') as f:
             pickle.dump(self.module.hyperparams, f)
 
         validation = dev_loader is not None
@@ -65,7 +66,7 @@ class Model:
         best_val_metric = float('inf')  # TODO:update lower/upper bound
         for epoch in range(epochs):
             self.module.train()
-            scheduler.step()
+
             for samples in tqdm(loader, desc='Epoch {}'.format(epoch)):
                 optimizer.zero_grad()
 
@@ -101,13 +102,13 @@ class Model:
                 checkpoint_filename = 'model-{:03d}.ckpt'.format(epoch)
                 best_checkpoint = checkpoint_filename
 
-            checkpoint_filepath = os.path.join(
-                working_env, 'checkpoints', checkpoint_filename)
+            scheduler.step()
+
+            checkpoint_filepath = working_env / 'checkpoints' / checkpoint_filename
             torch.save(self.module.state_dict(), checkpoint_filepath)
 
         writer.close()
-        best_checkpoint = os.path.join(
-            working_env, 'checkpoints', best_checkpoint)
+        best_checkpoint = working_env / 'checkpoints' / best_checkpoint
         return best_checkpoint
 
     def eval(self,
