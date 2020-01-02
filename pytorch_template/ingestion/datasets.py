@@ -19,7 +19,7 @@ class IngestDataset(Dataset):
         self.transform = transform
 
         self.dataframe = pd.read_csv(self.root_dir / targets_file, index_col=0)
-        self.dataframe = self.dataframe.filter(regex='^{}'.format(split), axis=0)
+        self.dataframe = self.dataframe.filter(regex=f'^{split}', axis=0)
 
     def __len__(self) -> int:
         return len(self.dataframe)

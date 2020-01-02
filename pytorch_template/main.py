@@ -81,8 +81,8 @@ class PyTorchTemplate:
             shutil.rmtree(output_dir, ignore_errors=True)
         output_dir.mkdir(parents=True)
 
-        for sample in tqdm(loader, desc='Writing {} feature files'.format(split)):
-            output_path = output_dir / '{}.npy'.format(sample['filename'])
+        for sample in tqdm(loader, desc=f'Writing {split} feature files'):
+            output_path = output_dir / f"{sample['filename']}.npy"
             np.save(output_path, np.array([sample['features'], sample['target']]))
 
         #  TODO: remove metadata file if not needed (as here)
@@ -102,8 +102,8 @@ class PyTorchTemplate:
         PyTorchTemplate._set_logger(silent, debug)
         working_env = PyTorchTemplate._create_working_env(output_dir)
 
-        logging.info('Batch size: {}'.format(batch_size))
-        logging.info('Learning rate: {}'.format(lr))
+        logging.info(f'Batch size: {batch_size}')
+        logging.info(f'Learning rate: {lr}')
 
         to_tensor = ToTensor()  # TODO: update transformations
 
@@ -138,9 +138,9 @@ class PyTorchTemplate:
         PyTorchTemplate._set_logger(silent, debug)
         working_env = PyTorchTemplate._create_working_env(output_dir)
 
-        logging.info('Checkpoint: {}'.format(checkpoint))
-        logging.info('Batch size: {}'.format(batch_size))
-        logging.info('Learning rate: {}'.format(lr))
+        logging.info(f'Checkpoint: {checkpoint}')
+        logging.info(f'Batch size: {batch_size}')
+        logging.info(f'Learning rate: {lr}')
 
         to_tensor = ToTensor()  # TODO: update transformations
 
