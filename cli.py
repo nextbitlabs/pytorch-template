@@ -41,7 +41,7 @@ class CLI:
 
         args = parser.parse_args(sys.argv[2:])
         metadata_path = PyTorchTemplate.ingest(args.data_dir, args.split)
-        print('Metadata saved at {}'.format(metadata_path))
+        print(f'Metadata saved at {metadata_path}')
 
     @staticmethod
     def train() -> None:
@@ -66,7 +66,7 @@ class CLI:
         best_checkpoint = PyTorchTemplate.train(
             args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr,
             args.silent, args.debug)
-        print('Best checkpoint saved at {}'.format(best_checkpoint))
+        print(f'Best checkpoint saved at {best_checkpoint}')
 
     @staticmethod
     def restore() -> None:
@@ -93,7 +93,7 @@ class CLI:
         best_checkpoint = PyTorchTemplate.restore(
             args.npy_dir, args.checkpoint, args.output_dir, args.batch_size,
             args.epochs, args.lr, args.silent, args.debug)
-        print('Best checkpoint saved at {}'.format(best_checkpoint))
+        print(f'Best checkpoint saved at {best_checkpoint}')
 
     @staticmethod
     def eval() -> None:
@@ -108,8 +108,7 @@ class CLI:
         args = parser.parse_args(sys.argv[2:])
         val_loss, val_metric = PyTorchTemplate.evaluate(
             args.checkpoint, args.npy_dir, args.batch_size)
-        val_log_string = 'Validation - Loss: {:.4f} - Metric: {:.4f}'
-        print(val_log_string.format(val_loss, val_metric))
+        print(f'Validation - Loss: {val_loss:.4f} - Metric: {val_metric:.4f}')
 
     @staticmethod
     def test() -> None:
@@ -121,7 +120,7 @@ class CLI:
 
         args = parser.parse_args(sys.argv[2:])
         prediction = PyTorchTemplate.test(args.checkpoint, args.data_path)
-        print('Output: {:.4f}'.format(prediction))
+        print(f'Output: {prediction:.4f}')
 
 
 if __name__ == '__main__':

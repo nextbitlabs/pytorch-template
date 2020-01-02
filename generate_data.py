@@ -31,16 +31,16 @@ if __name__ == '__main__':
     dataframe.index.name = 'filepath'
 
     for i, features in enumerate(training_set):
-        filename = Path('train') / 'train_{:03d}.npy'.format(i)
+        filename = Path('train') / f'train_{i:03d}.npy'
         np.save(Path('data') / filename, features)
         dataframe.loc[filename] = training_targets[i]
 
     for i, features in enumerate(validation_set):
-        filename = Path('dev') / 'dev_{:03d}.npy'.format(i)
+        filename = Path('dev') / f'dev_{i:03d}.npy'
         np.save(Path('data') / filename, features)
         dataframe.loc[filename] = validation_targets[i]
 
     for i, features in enumerate(test_set):
-        np.save(Path('data') / 'test' / 'test_{:03d}.npy'.format(i), features)
+        np.save(Path('data') / 'test' / f'test_{i:03d}.npy', features)
 
     dataframe.to_csv(Path('data') / 'targets.csv', float_format='%.3f')
