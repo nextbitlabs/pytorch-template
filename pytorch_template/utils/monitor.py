@@ -4,7 +4,7 @@ import torch
 
 
 class Monitor:
-    def __init__(self, reduction: str = 'none'):
+    def __init__(self, reduction: str = 'mean'):
         self.reduction = reduction
         self.cumulated_value = 0
         self.num_samples = 0
