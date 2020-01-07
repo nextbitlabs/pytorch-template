@@ -5,6 +5,7 @@ from typing import Optional, Tuple, Dict
 
 import torch
 import torch.nn as nn
+import torch.optim
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
@@ -32,8 +33,7 @@ class Model:
                 info = info + f" | {attr}: {scheduler.__dict__[attr]}"
         return info
 
-    def __init__(self,
-                 module: nn.Module):
+    def __init__(self, module: nn.Module):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.module = module.to(device)
         self.criterion = nn.MSELoss()  # TODO: update
@@ -52,8 +52,9 @@ class Model:
         validation = dev_loader is not None
 
         # TODO: update optimizer
-        optimizer = torch.optim.SGD(self.module.parameters(), lr=lr,
-                                    momentum=0.9, nesterov=True, weight_decay=1e-4)
+        optimizer = torch.optim.SGD(
+            self.module.parameters(), lr=lr, momentum=0.9, nesterov=True, weight_decay=1e-4
+        )
         logging.info(f'Optimizer: {self._get_optimizer_info(optimizer)}')
 
         # TODO: update scheduler
@@ -101,7 +102,7 @@ class Model:
                 checkpoint_filename = f'model-{epoch:03d}.ckpt'
                 best_checkpoint = checkpoint_filename
 
-            scheduler.step()
+            scheduler.step(epoch=epoch + 1)
 
             checkpoint_filepath = working_env / 'checkpoints' / checkpoint_filename
             torch.save(self.module.state_dict(), checkpoint_filepath)
@@ -110,8 +111,7 @@ class Model:
         best_checkpoint = working_env / 'checkpoints' / best_checkpoint
         return best_checkpoint
 
-    def eval(self,
-             dev_loader: DataLoader) -> Tuple[float, float]:
+    def eval(self, dev_loader: DataLoader) -> Tuple[float, float]:
         val_loss_monitor = Monitor()
         val_metric_monitor = Monitor()
         metric = nn.L1Loss()  # TODO: update metrics
@@ -129,13 +129,12 @@ class Model:
                 loss = self.criterion(predictions, targets)
                 l1loss = metric(predictions, targets)
 
-                val_loss_monitor.update(loss)
-                val_metric_monitor.update(l1loss)
+                val_loss_monitor.update(loss, batch_size=inputs.size(0))
+                val_metric_monitor.update(l1loss, batch_size=inputs.size(0))
 
         return val_loss_monitor.value, val_metric_monitor.value
 
-    def predict(self,
-                sample: Dict[str, torch.Tensor]) -> float:
+    def predict(self, sample: Dict[str, torch.Tensor]) -> float:
         features = sample['features']
         if torch.cuda.is_available():
             features = features.cuda(non_blocking=True)
