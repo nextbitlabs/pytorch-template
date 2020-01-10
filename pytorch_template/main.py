@@ -16,6 +16,7 @@ from .ingestion.datasets import IngestDataset, NpyDataset
 from .ingestion.transforms import ToTensor
 from .models.linear import LinearRegression
 from .models.model import Model
+from .utils.logger import initialize_logger
 
 if platform.system() == 'Windows':
     num_workers = 0
@@ -25,29 +26,6 @@ else:
 
 # TODO: update class name
 class PyTorchTemplate:
-
-    @staticmethod
-    def _set_logger(silent: bool = False,
-                    debug: bool = False) -> None:
-        logger = logging.getLogger()
-        logger.setLevel(logging.DEBUG if debug else logging.WARNING if silent else logging.INFO)
-        log_formatter = logging.Formatter('%(asctime)s | %(message)s')
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(log_formatter)
-        logger.addHandler(console_handler)
-
-    @staticmethod
-    def _create_working_env(output_dir: str) -> str:
-        working_env = Path(output_dir) / 'runs' / str(int(time.time()))
-        Path.mkdir(working_env / 'checkpoints', parents=True)
-        Path.mkdir(working_env / 'logs')
-
-        logger = logging.getLogger()
-        file_handler = logging.FileHandler(
-            working_env / 'logs' / 'train_info.log')
-        logger.addHandler(file_handler)
-
-        return working_env
 
     @staticmethod
     def _load_model(checkpoint: str) -> Model:
@@ -68,7 +46,7 @@ class PyTorchTemplate:
     @staticmethod
     def ingest(root_dir: str,
                split: str) -> str:
-        PyTorchTemplate._set_logger()
+        initialize_logger()
 
         # TODO: add transformations
 
@@ -96,11 +74,10 @@ class PyTorchTemplate:
               output_dir: str,
               batch_size: int,
               epochs: int,
-              lr: float,
-              silent: bool,
-              debug: bool) -> str:
-        PyTorchTemplate._set_logger(silent, debug)
-        working_env = PyTorchTemplate._create_working_env(output_dir)
+              lr: float) -> str:
+        run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
+        (run_dir / 'checkpoints').mkdir(parents=True)
+        initialize_logger(run_dir)
 
         logging.info(f'Batch size: {batch_size}')
         logging.info(f'Learning rate: {lr}')
@@ -123,7 +100,7 @@ class PyTorchTemplate:
         module = LinearRegression(train_dataset.features_shape[-1])
         model = Model(module)
         best_checkpoint = model.fit(
-            working_env, train_loader, epochs, lr, dev_loader)
+            run_dir, train_loader, epochs, lr, dev_loader)
         return best_checkpoint
 
     @staticmethod
@@ -132,11 +109,10 @@ class PyTorchTemplate:
                 output_dir: str,
                 batch_size: int,
                 epochs: int,
-                lr: float,
-                silent: bool,
-                debug: bool) -> str:
-        PyTorchTemplate._set_logger(silent, debug)
-        working_env = PyTorchTemplate._create_working_env(output_dir)
+                lr: float) -> str:
+        run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
+        (run_dir / 'checkpoints').mkdir(parents=True)
+        initialize_logger(run_dir)
 
         logging.info(f'Checkpoint: {checkpoint}')
         logging.info(f'Batch size: {batch_size}')
@@ -159,7 +135,7 @@ class PyTorchTemplate:
 
         model = PyTorchTemplate._load_model(checkpoint)
         best_checkpoint = model.fit(
-            working_env, train_loader, epochs, lr, dev_loader)
+            run_dir, train_loader, epochs, lr, dev_loader)
         return best_checkpoint
 
     @staticmethod
@@ -179,7 +155,7 @@ class PyTorchTemplate:
     @staticmethod
     def test(checkpoint: str,
              data_path: str) -> float:
-        PyTorchTemplate._set_logger()
+        initialize_logger()
         model = PyTorchTemplate._load_model(checkpoint)
         to_tensor = ToTensor()  # TODO: update transformations
 
