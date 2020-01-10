@@ -54,14 +54,14 @@ You can install the package on MacOS/Linux with the following commands:
 ```
 git clone git@gitlab.com:nextbit/AI-research/pytorch-template.git
 cd pytorch-template
-python3.6 setup.py sdist
-python3.6 setup.py bdist_wheel
-pip3.6 install --no-index --find-links=dist pytorch_template -r requirements.txt
+python3 setup.py sdist
+python3 setup.py bdist_wheel
+pip3 install --no-index --find-links=dist pytorch_template -r requirements.txt
 ```
 
 Here data are synthetic so, in order to generate them run:
 ```
-python3.6 generate_data.py
+python3 generate_data.py
 ```
 
 ## Usage
@@ -72,7 +72,7 @@ It is defined in the file `cli.py`.
 To see more details about the command line interface
 it is possible to show the help page using the command:
 ```
-python3.6 cli.py --help
+python3 cli.py --help
 ``` 
 
 The available commands are:
@@ -85,7 +85,7 @@ training;
 
 Every command has its separate help page that can be visualized with
 ```
-python3.6 cli.py <command> --help
+python3 cli.py <command> --help
 ```
 
 ### Command `ingest`
@@ -124,13 +124,13 @@ at the end of the computation.
 Only the training set and the development set have to be ingested
 and that can be do with the following lines:
 ```
-python3.6 cli.py ingest data/ train
-python3.6 cli.py ingest data/ dev
+python3 cli.py ingest data/ train
+python3 cli.py ingest data/ dev
 ```
 
 For more details on the usage you can access the help page with the command
 ```
-python3.6 cli.py ingest --help
+python3 cli.py ingest --help
 ```
 
 ### Command `train`
@@ -172,13 +172,13 @@ The most basic training can be performed specifying just the directory containin
 the dataset, already split in `train` (compulsory) and `dev` (optional) folders
 using the default values for the other parameters.
 ```
-python3.6 cli.py train data/npy
+python3 cli.py train data/npy
 ```
 
 An equivalent form of the previous command with all the default values
 manually specified is:
 ```
-python3.6 cli.py train \
+python3 cli.py train \
     data/npy \
     --output-dir . \
     --batch-size 20 \
@@ -188,7 +188,7 @@ python3.6 cli.py train \
 
 For more details on the usage you can access the help page with the command
 ```
-python3.6 cli.py train --help
+python3 cli.py train --help
 ```
 
 ### Command `restore`
@@ -208,13 +208,13 @@ The most basic restored training can be performed specifying just the directory
 containing the dataset, already split in `train` (compulsory) and `dev` (optional)
 folders, and the checkpoint path using the default values for the other parameters.
 ```
-python3.6 cli.py restore data/npy runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt
+python3 cli.py restore data/npy runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt
 ```
 
 An equivalent form of the previous command with all the default values
 manually specified is:
 ```
-python3.6 cli.py restore \
+python3 cli.py restore \
     data/npy \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
     --output-dir . \
@@ -225,7 +225,7 @@ python3.6 cli.py restore \
 
 For more details on the usage you can access the help page with the command
 ```
-python3.6 cli.py restore --help
+python3 cli.py restore --help
 ```
 
 ### Command `eval`
@@ -259,7 +259,7 @@ value is 20.
 
 A full call to the command is:
 ```
-python3.6 cli.py eval \
+python3 cli.py eval \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
     data/npy \
     --batch-size 20
@@ -267,7 +267,7 @@ python3.6 cli.py eval \
 
 For more details on the usage you can access the help page with the command
 ```
-python3.6 cli.py eval --help
+python3 cli.py eval --help
 ```
 
 ### Command `test`
@@ -289,14 +289,14 @@ graph TD;
 The test of the model is performed specifying the model checkpoint to be evaluated
 and the path to a sample, for example:
 ```
-python3.6 cli.py test \
+python3 cli.py test \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
     data/test/<sample>.npy
 ```
 
 For more details on the usage you can access the help page with the command
 ```
-python3.6 cli.py test --help
+python3 cli.py test --help
 ```
 
 ## Performances

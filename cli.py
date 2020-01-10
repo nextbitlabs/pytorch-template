@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 import argparse
 import sys
@@ -12,7 +12,7 @@ class CLI:
         #  TODO: update description and usage
         parser = argparse.ArgumentParser(
             description='Command line interface for PyTorch template',
-            usage=('python3.6 cli.py <command> [<args>]\n'
+            usage=('python3 cli.py <command> [<args>]\n'
                    '\n'
                    'ingest      Ingest data\n'
                    'train       Train the model\n'
@@ -37,7 +37,7 @@ class CLI:
         #  TODO: update parameters and default values
         parser.add_argument('data_dir', type=str, help='Data directory')
         parser.add_argument('split', type=str, help='Split name',
-                            choices=['train', 'dev', 'test'])
+                            choices=('train', 'dev', 'test'))
 
         args = parser.parse_args(sys.argv[2:])
         metadata_path = PyTorchTemplate.ingest(args.data_dir, args.split)
