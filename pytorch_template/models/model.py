@@ -65,7 +65,7 @@ class Model:
         val_log_string = 'Validation after epoch {:d} - Loss: {:.4f} - L1: {:.4f}'
         best_checkpoint = ''
         best_val_metric = float('inf')  # TODO:update lower/upper bound
-        for epoch in range(epochs):
+        for epoch in range(1, epochs + 1):
             self.module.train()
 
             for samples in tqdm(loader, desc=f'Epoch {epoch}'):
