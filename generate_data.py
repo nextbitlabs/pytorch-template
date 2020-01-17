@@ -15,6 +15,7 @@ VALIDATION_SET_SIZE = 20
 TEST_SET_SIZE = 20
 
 if __name__ == '__main__':
+    np.random.seed(0)
 
     (Path('data') / 'train').mkdir(parents=True, exist_ok=True)
     (Path('data') / 'dev').mkdir(parents=True, exist_ok=True)
