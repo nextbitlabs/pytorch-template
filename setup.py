@@ -55,8 +55,8 @@ setup(
     install_requires=[
         'numpy >= 1.13',
         'tensorboard>=2.0',
-        'torch >= 1.3.1',
-        'torchvision >= 0.2.1',
+        'torch >= 1.4',
+        'torchvision >= 0.2',
         'tqdm >= 4.23'
     ]
 )

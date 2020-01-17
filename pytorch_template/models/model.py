@@ -84,7 +84,7 @@ class Model:
                 if total_step % self.SUMMARY_STEPS == 0:
                     writer.add_scalar('loss', loss.item(), total_step)
 
-            writer.add_scalar('lr', scheduler.get_lr()[0], total_step)
+            writer.add_scalar('lr', scheduler.get_last_lr()[0], total_step)
 
             if validation:
                 val_loss, val_metric = self.eval(dev_loader)
@@ -99,7 +99,7 @@ class Model:
                 checkpoint_filename = f'model-{epoch:03d}.ckpt'
                 best_checkpoint = checkpoint_filename
 
-            scheduler.step(epoch=epoch + 1)
+            scheduler.step()
 
             checkpoint_filepath = working_env / 'checkpoints' / checkpoint_filename
             torch.save(self.module.state_dict(), checkpoint_filepath)
