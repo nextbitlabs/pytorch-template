@@ -1,6 +1,8 @@
 import logging
 import pathlib
-from typing import Union
+from typing import Union, Optional, Dict
+
+from torch.utils.tensorboard import SummaryWriter
 
 
 def initialize_logger(output_dir: Union[None, pathlib.Path, str] = None) -> None:
@@ -18,3 +20,10 @@ def initialize_logger(output_dir: Union[None, pathlib.Path, str] = None) -> None
         file_handler = logging.FileHandler(logs_dir / 'train_info.log')
         file_handler.setFormatter(log_formatter)
         logger.addHandler(file_handler)
+
+
+def log_dictionary(data: Dict, writer: Optional[SummaryWriter] = None) -> None:
+    for k, v in data.items():
+        logging.info(f'{k}: {v}')
+        if writer is not None:
+            writer.add_text(str(k), str(v))

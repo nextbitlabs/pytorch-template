@@ -94,10 +94,6 @@ The ingestion phase is useful if preprocessing is computationally expensive and
 many transformations are required. Here, for example, it is not really necessary
 but it is included to show the code structure.
 
-Optionally the `ingest` command can save some metadata about the dataset split,
-like dataset global statistics computed during the full pass of the dataset,
-in a pickle `.pkl` file and return the path of this file.
-
 In some cases an additional `safe-ingest` can be used to check and assure labels 
 coherence among the different dataset splits or to perform transformations
 that depend on other splits. Here it is not needed because the
@@ -113,11 +109,8 @@ graph TD;
     Normalize-->|and saved on disk by|ToFile
     ToFile-->decision{ingestion<br/>completed?}
     decision-->|no|DataLoader
-    decision-->|yes|metadata    
+    decision-->|yes|END
 ```
-
-The path to the dictionary metadata is printed to console 
-at the end of the computation.
 
 #### Examples
 
@@ -215,8 +208,8 @@ An equivalent form of the previous command with all the default values
 manually specified is:
 ```
 python3 cli.py restore \
-    data/npy \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
+    data/npy \
     --output-dir . \
     --batch-size 20 \
     --epochs 40 \
@@ -306,18 +299,36 @@ The model converges to perfect predictions using default parameters.
 ## Deployment
 
 The template can be deployed on an NGC optimized instance, here we list
-the steps necessary to configure it on a AWS EC2 **p3.2xlarge** instance
+the steps necessary to configure it on a AWS EC2 **g4dn.xlarge** instance
 on the **NVIDIA Volta Deep Learning AMI** environment.
 
 1. Log in via ssh following the instructions on the EC2 Management Dashboard.
-2. Insert the Nvidia API key (register on developer.nvidia.com to get one).
-3. Clone the repo `pytorch-template` in the home directory.
-4. Run the script `gpu-install.sh`.
-5. Run the command `cd /pytorch-template`. 
-
-At the end of the procedure you will access to a terminal on a Docker
+2. Clone the repo `pytorch-template` in the home directory.
+3. Download the most update PyTorch container running 
+`docker pull nvcr.io/nvidia/pytorch:<yy>.<mm>-py3`
+4. Create a container with
+```
+docker run --gpus all --name template -e HOME=$HOME -e USER=$USER \
+    -v $HOME:$HOME -p 6006:6006 --shm-size 60G -it nvcr.io/nvidia/pytorch:<yy>.<mm>-py3
+```
+At the end of the procedure you will gain access to a terminal on a Docker
 container configured to work on the GPU and you could simply run the commands
 above leveraging the speed of parallel computing.
+
+The `$HOME` directory on the Docker container is linked to the `$HOME` directory
+of the host machine, so the repository can be found in the `$HOME`, similarly the
+port 6006 used by TensorBoard is remapped from the container to the port 6006
+of the host machine.
+
+Useful commands to interact with the Docker container are:
+- `docker start galaga`: start the container;
+- `docker exec -it galaga bash`: open a terminal on the container;
+- `docker stop galaga`: stop the container;
+- `docker rm galaga`: remove the container.
+
+In order to monitor training you can run the following commands from the container console:
+- `watch -n 1 nvidia-smi` to monitor GPU usage;
+- `tensorboard --logdir runs/<run_id> --bind_all` to start Tensorboard.
 
 ## License
 
