@@ -1,6 +1,6 @@
+import json
 import logging
 import multiprocessing
-import pickle
 import shutil
 import time
 from pathlib import Path
@@ -23,8 +23,8 @@ from .utils.logger import initialize_logger
 class PyTorchTemplate:
     @staticmethod
     def _load_model(checkpoint: str) -> Model:
-        with open(Path(checkpoint).parent / 'hyperparams.pkl', 'rb') as f:
-            hyperparams = pickle.load(f)
+        with open(Path(checkpoint).parent.parent / 'hyperparams.json', 'r') as f:
+            hyperparams = json.load(f)
 
         if LinearRegression.__name__ == hyperparams['module_name']:  # TODO: update module
             module_class = LinearRegression  # TODO: update module
@@ -38,7 +38,7 @@ class PyTorchTemplate:
         return model
 
     @staticmethod
-    def ingest(root_dir: str, split: str) -> str:
+    def ingest(root_dir: str, split: str) -> None:
         initialize_logger()
 
         # TODO: update transformations
@@ -65,12 +65,6 @@ class PyTorchTemplate:
         for sample in tqdm(loader, desc=f'Writing {split} feature files'):
             output_path = output_dir / f"{sample['filename']}.npy"
             np.save(output_path, np.array([sample['features'].numpy(), sample['target']]))
-
-        #  TODO: remove metadata file if not needed (as here)
-        metadata_path = Path(root_dir) / 'npy' / split / 'metadata.pkl'
-        with open(metadata_path, 'wb') as f:
-            pickle.dump({'num_files': len(dataset)}, f)
-        return metadata_path
 
     @staticmethod
     def train(npy_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float) -> str:
@@ -109,7 +103,7 @@ class PyTorchTemplate:
 
     @staticmethod
     def restore(
-            npy_dir: str, checkpoint: str, output_dir: str, batch_size: int, epochs: int, lr: float
+            checkpoint: str, npy_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float
     ) -> str:
         run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)

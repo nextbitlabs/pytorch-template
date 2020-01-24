@@ -1,5 +1,5 @@
+import json
 import logging
-import pickle
 from pathlib import Path
 from typing import Optional, Tuple, Dict
 
@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
+from ..utils.logger import log_dictionary
 from ..utils.monitor import Monitor
 
 
@@ -38,16 +39,19 @@ class Model:
         self.module = module.to(self.device)
         self.criterion = nn.MSELoss()  # TODO: update
 
-    def fit(self,
+    def fit(
+            self,
             working_env: str,
             loader: DataLoader,
             epochs: int,
             lr: float,
-            dev_loader: Optional[DataLoader] = None) -> str:
+            dev_loader: Optional[DataLoader] = None,
+    ) -> str:
         working_env = Path(working_env)
         writer = SummaryWriter(working_env / 'logs')
-        with open(working_env / 'checkpoints' / 'hyperparams.pkl', 'wb') as f:
-            pickle.dump(self.module.hyperparams, f)
+        with open(working_env / 'hyperparams.json', 'w') as f:
+            json.dump(self.module.hyperparams, f)
+        log_dictionary(self.module.hyperparams, writer)
 
         validation = dev_loader is not None
 
@@ -82,14 +86,14 @@ class Model:
 
                 total_step += 1
                 if total_step % self.SUMMARY_STEPS == 0:
-                    writer.add_scalar('loss', loss.item(), total_step)
+                    writer.add_scalar('loss/train', loss.item(), total_step)
 
             writer.add_scalar('lr', scheduler.get_last_lr()[0], total_step)
 
             if validation:
                 val_loss, val_metric = self.eval(dev_loader)
-                writer.add_scalar('val_loss', val_loss, total_step)
-                writer.add_scalar('val_metric', val_metric, total_step)
+                writer.add_scalar('loss/val', val_loss, total_step)
+                writer.add_scalar('metric/val', val_metric, total_step)
                 logging.info(val_log_string.format(epoch, val_loss, val_metric))
                 checkpoint_filename = f'model-{epoch:03d}_{val_metric:.3f}.ckpt'
                 if val_metric < best_val_metric:  # TODO: update inequality
