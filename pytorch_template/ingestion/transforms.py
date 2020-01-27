@@ -1,11 +1,10 @@
-from typing import Union, Sequence
+from typing import Sequence
 
-import numpy as np
 import torch
 
 
 class ToTensor:
-    def __call__(self, value: Union[np.array, float]) -> torch.Tensor:
+    def __call__(self, value: float) -> torch.Tensor:
         # noinspection PyCallingNonCallable
         return torch.as_tensor(value)
 

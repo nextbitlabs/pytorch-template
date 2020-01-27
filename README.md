@@ -117,8 +117,8 @@ graph TD;
 Only the training set and the development set have to be ingested
 and that can be do with the following lines:
 ```
-python3 cli.py ingest data/ train
-python3 cli.py ingest data/ dev
+python3 cli.py ingest data train
+python3 cli.py ingest data dev
 ```
 
 For more details on the usage you can access the help page with the command
@@ -165,14 +165,14 @@ The most basic training can be performed specifying just the directory containin
 the dataset, already split in `train` (compulsory) and `dev` (optional) folders
 using the default values for the other parameters.
 ```
-python3 cli.py train data/npy
+python3 cli.py train data/tensors
 ```
 
 An equivalent form of the previous command with all the default values
 manually specified is:
 ```
 python3 cli.py train \
-    data/npy \
+    data/tensors \
     --output-dir . \
     --batch-size 20 \
     --epochs 40 \
@@ -201,7 +201,7 @@ The most basic restored training can be performed specifying just the directory
 containing the dataset, already split in `train` (compulsory) and `dev` (optional)
 folders, and the checkpoint path using the default values for the other parameters.
 ```
-python3 cli.py restore data/npy runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt
+python3 cli.py restore runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt data/tensors
 ```
 
 An equivalent form of the previous command with all the default values
@@ -209,7 +209,7 @@ manually specified is:
 ```
 python3 cli.py restore \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
-    data/npy \
+    data/tensors \
     --output-dir . \
     --batch-size 20 \
     --epochs 40 \
@@ -254,7 +254,7 @@ A full call to the command is:
 ```
 python3 cli.py eval \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
-    data/npy \
+    data/tensors \
     --batch-size 20
 ```
 
@@ -284,7 +284,7 @@ and the path to a sample, for example:
 ```
 python3 cli.py test \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
-    data/test/<sample>.npy
+    data/test/<sample>.pt
 ```
 
 For more details on the usage you can access the help page with the command

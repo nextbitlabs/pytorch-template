@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Any, Union, Optional, Callable, Dict
 
-import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset
@@ -9,7 +8,8 @@ from torch.utils.data import Dataset
 
 class IngestDataset(Dataset):
     def __init__(
-            self, root_dir: str, split: str, transform: Optional[Callable[[np.array], Any]] = None
+            self, root_dir: str, split: str,
+            transform: Optional[Callable[[Union[torch.Tensor, float]], Any]] = None
     ):
         self.root_dir = Path(root_dir).expanduser()
         self.split = split
@@ -24,12 +24,12 @@ class IngestDataset(Dataset):
     def __len__(self) -> int:
         return len(self.dataframe)
 
-    def __getitem__(self, idx: int) -> Dict[str, Union[np.array, float, str]]:
+    def __getitem__(self, idx: int) -> Dict[str, Union[torch.Tensor, float, str]]:
         # TODO: update return types
         filepath = self.root_dir / self.dataframe.index[idx]
         # TODO: update
         sample = {
-            'features': np.load(filepath),
+            'features': torch.load(filepath),
             'target': self.dataframe.iloc[idx, 0],
             'filename': filepath.name.rsplit('.', 1)[0],
         }
@@ -40,8 +40,8 @@ class IngestDataset(Dataset):
         return sample
 
 
-class NpyDataset(Dataset):
-    ACCEPTED_EXTENSIONS = ('.npy',)  # TODO: update
+class TorchDataset(Dataset):
+    ACCEPTED_EXTENSIONS = ('.pt',)  # TODO: update
 
     def __init__(
             self, root_dir: str, split: str, transform: Optional[Callable[[Dict], Dict]] = None
@@ -54,18 +54,18 @@ class NpyDataset(Dataset):
 
         split_path = self.root_dir / self.split
         self.filepaths = tuple(
-            sorted(e for e in split_path.iterdir() if e.suffix in NpyDataset.ACCEPTED_EXTENSIONS)
+            sorted(e for e in split_path.iterdir() if e.suffix in TorchDataset.ACCEPTED_EXTENSIONS)
         )
 
     def __len__(self) -> int:
         return len(self.filepaths)
 
-    def __getitem__(self, idx: int) -> Dict[str, Union[np.array, torch.Tensor]]:
+    def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         # TODO: update return types
         filepath = self.filepaths[idx]
         # TODO: update
-        features, target = np.load(filepath, allow_pickle=True)
-        sample = {'features': features.astype(np.float32), 'target': target}
+        features, target = torch.load(filepath)
+        sample = {'features': features, 'target': target}
 
         if self.transform:
             sample = self.transform(sample)
