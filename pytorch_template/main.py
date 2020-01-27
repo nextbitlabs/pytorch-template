@@ -163,6 +163,19 @@ class PyTorchTemplate:
         initialize_logger()
         model = PyTorchTemplate._load_model(checkpoint)
 
-        features = {'features': torch.load(data_path)}  # TODO: update data loading
+        # TODO: update transformations to be coherent with what was used during training
+        transform = Compose(
+            [
+                ToTensor(),
+                # TODO: if you need normalization, replace values with statistics computed by
+                #  dataset_statistics.py ; else remove it.
+                Normalize(
+                    mean=(0.502, 0.475, 0.475, 0.534, 0.493),
+                    std=(0.283, 0.277, 0.281, 0.302, 0.306),
+                ),
+            ]
+        )
+
+        features = {'features': transform(torch.load(data_path))}  # TODO: update data loading
         prediction = model.predict(features)
         return prediction
