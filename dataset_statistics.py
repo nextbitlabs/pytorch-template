@@ -12,6 +12,7 @@ from pytorch_template.ingestion import ToTensor
 
 
 def compute_statistics(root_dir: str) -> None:
+    # TODO: update transform
     dataset = IngestDataset(
         root_dir=root_dir, split='train', transform=ToTensor()
     )

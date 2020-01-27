@@ -6,14 +6,13 @@ import time
 from pathlib import Path
 from typing import Tuple
 
-import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose
 from tqdm import tqdm
 
-from .ingestion.datasets import IngestDataset, NpyDataset
-from .ingestion.transforms import ToTensor, Normalize
+from .ingestion.datasets import IngestDataset, TorchDataset
+from .ingestion.transforms import Normalize, ToTensor
 from .models.linear import LinearRegression
 from .models.model import Model
 from .utils.logger import initialize_logger
@@ -33,7 +32,8 @@ class PyTorchTemplate:
         del hyperparams['module_name']
 
         module = module_class(**hyperparams)
-        module.load_state_dict(torch.load(checkpoint))
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        module.load_state_dict(torch.load(checkpoint, map_location=device))
         model = Model(module)
         return model
 
@@ -42,10 +42,14 @@ class PyTorchTemplate:
         initialize_logger()
 
         # TODO: update transformations
+        # TODO: Compose is not needed in case of a single transform inside
         transform = Compose(
             [
                 ToTensor(),
-                # TODO: replace values with statistics computed by dataset_statistics.py
+                # TODO: ToTensor is useless in this case, but preserved as an example.
+                #  Check if you really need it
+                # TODO: if you need normalization, replace values with statistics computed by
+                #  dataset_statistics.py ; else remove it.
                 Normalize(
                     mean=(0.502, 0.475, 0.475, 0.534, 0.493),
                     std=(0.283, 0.277, 0.281, 0.302, 0.306),
@@ -57,17 +61,17 @@ class PyTorchTemplate:
         loader = DataLoader(dataset, batch_size=None, num_workers=multiprocessing.cpu_count())
 
         # TODO: update path
-        output_dir = Path(root_dir) / 'npy' / Path(split)
+        output_dir = Path(root_dir) / 'tensors' / split
         if output_dir.exists():
             shutil.rmtree(output_dir, ignore_errors=True)
         output_dir.mkdir(parents=True)
 
         for sample in tqdm(loader, desc=f'Writing {split} feature files'):
-            output_path = output_dir / f"{sample['filename']}.npy"
-            np.save(output_path, np.array([sample['features'].numpy(), sample['target']]))
+            output_path = output_dir / f"{sample['filename']}.pt"
+            torch.save(([sample['features'], sample['target']]), output_path)
 
     @staticmethod
-    def train(npy_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float) -> str:
+    def train(tensor_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float) -> str:
         run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
         initialize_logger(run_dir)
@@ -75,7 +79,7 @@ class PyTorchTemplate:
         logging.info(f'Batch size: {batch_size}')
         logging.info(f'Learning rate: {lr}')
 
-        train_dataset = NpyDataset(npy_dir, 'train')
+        train_dataset = TorchDataset(tensor_dir, 'train')
         train_loader = DataLoader(
             train_dataset,
             batch_size=batch_size,
@@ -84,8 +88,8 @@ class PyTorchTemplate:
             pin_memory=True,
         )
 
-        if (Path(npy_dir) / 'dev').is_dir():
-            dev_dataset = NpyDataset(npy_dir, 'dev')
+        if (Path(tensor_dir) / 'dev').is_dir():
+            dev_dataset = TorchDataset(tensor_dir, 'dev')
             dev_loader = DataLoader(
                 dev_dataset,
                 batch_size=batch_size,
@@ -103,7 +107,8 @@ class PyTorchTemplate:
 
     @staticmethod
     def restore(
-            checkpoint: str, npy_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float
+            checkpoint: str, tensor_dir: str, output_dir: str, batch_size: int, epochs: int,
+            lr: float
     ) -> str:
         run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
@@ -113,7 +118,7 @@ class PyTorchTemplate:
         logging.info(f'Batch size: {batch_size}')
         logging.info(f'Learning rate: {lr}')
 
-        train_dataset = NpyDataset(npy_dir, 'train')
+        train_dataset = TorchDataset(tensor_dir, 'train')
         train_loader = DataLoader(
             train_dataset,
             batch_size=batch_size,
@@ -122,8 +127,8 @@ class PyTorchTemplate:
             pin_memory=True,
         )
 
-        if (Path(npy_dir) / 'dev').is_dir():
-            dev_dataset = NpyDataset(npy_dir, 'dev')
+        if (Path(tensor_dir) / 'dev').is_dir():
+            dev_dataset = TorchDataset(tensor_dir, 'dev')
             dev_loader = DataLoader(
                 dev_dataset,
                 batch_size=batch_size,
@@ -139,8 +144,8 @@ class PyTorchTemplate:
         return best_checkpoint
 
     @staticmethod
-    def evaluate(checkpoint: str, npy_dir: str, batch_size: int) -> Tuple[float, float]:
-        dev_dataset = NpyDataset(npy_dir, 'dev')
+    def evaluate(checkpoint: str, tensor_dir: str, batch_size: int) -> Tuple[float, float]:
+        dev_dataset = TorchDataset(tensor_dir, 'dev')
         dev_loader = DataLoader(
             dev_dataset,
             batch_size=batch_size,
@@ -157,9 +162,7 @@ class PyTorchTemplate:
     def test(checkpoint: str, data_path: str) -> float:
         initialize_logger()
         model = PyTorchTemplate._load_model(checkpoint)
-        to_tensor = ToTensor()  # TODO: update transformations
 
-        features = {'features': np.load(data_path).astype(np.float32)}  # TODO: update data loading
-        features['features'] = to_tensor(features)
+        features = {'features': torch.load(data_path)}  # TODO: update data loading
         prediction = model.predict(features)
         return prediction

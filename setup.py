@@ -53,7 +53,6 @@ setup(
     packages=find_packages(exclude=['build', 'data', 'dist', 'docs', 'tests']),
     python_requires='>=3.6',
     install_requires=[
-        'numpy >= 1.13',
         'tensorboard>=2.0',
         'torch >= 1.4',
         'torchvision >= 0.2',

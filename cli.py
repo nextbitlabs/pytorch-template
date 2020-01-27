@@ -53,7 +53,7 @@ class CLI:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(description='Train the model')
         #  TODO: update parameters and default values
-        parser.add_argument('npy_dir', metavar='npy-dir', type=str, help='Npy directory')
+        parser.add_argument('tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory')
         parser.add_argument('--output-dir', type=str, help='Output directory', default='./')
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=30, help='Number of epochs')
@@ -61,7 +61,7 @@ class CLI:
 
         args = parser.parse_args(sys.argv[2:])
         best_checkpoint = PyTorchTemplate.train(
-            args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr
+            args.tensor_dir, args.output_dir, args.batch_size, args.epochs, args.lr
         )
         print(f'Best checkpoint saved at {best_checkpoint}')
 
@@ -71,7 +71,7 @@ class CLI:
         parser = argparse.ArgumentParser(description='Restore training from a checkpoint')
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
-        parser.add_argument('npy_dir', metavar='npy-dir', type=str, help='Npy directory')
+        parser.add_argument('tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory')
         parser.add_argument('--output-dir', type=str, help='Output directory', default='./')
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
@@ -79,7 +79,7 @@ class CLI:
 
         args = parser.parse_args(sys.argv[2:])
         best_checkpoint = PyTorchTemplate.restore(
-            args.checkpoint, args.npy_dir, args.output_dir, args.batch_size, args.epochs, args.lr
+            args.checkpoint, args.tensor_dir, args.output_dir, args.batch_size, args.epochs, args.lr
         )
         print(f'Best checkpoint saved at {best_checkpoint}')
 
@@ -89,12 +89,12 @@ class CLI:
         parser = argparse.ArgumentParser(description='Evaluate the model')
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
-        parser.add_argument('npy_dir', metavar='npy-dir', type=str, help='Npy directory')
+        parser.add_argument('tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory')
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
 
         args = parser.parse_args(sys.argv[2:])
         val_loss, val_metric = PyTorchTemplate.evaluate(
-            args.checkpoint, args.npy_dir, args.batch_size
+            args.checkpoint, args.tensor_dir, args.batch_size
         )
         print(f'Validation - Loss: {val_loss:.4f} - Metric: {val_metric:.4f}')
 
