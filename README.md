@@ -330,6 +330,33 @@ In order to monitor training you can run the following commands from the contain
 - `watch -n 1 nvidia-smi` to monitor GPU usage;
 - `tensorboard --logdir runs/<run_id> --bind_all` to start Tensorboard.
 
+## Other 
+The template also includes an implementation of a cool new optimizer, [Ranger](https://medium.com/@lessw/2dc83f79a48d). 
+Ranger uses the [Lookahead](https://arxiv.org/abs/1907.08610) optimization method together with the 
+[RAdam](https://arxiv.org/abs/1908.03265) optimizer.
+ It is not used here, as it is way too slow for such a simple model, but it reportedly performs better than other
+ Adam variants on deeper models. 
+ You can use it simply by calling:
+ ```
+from pytorch_template.models.optimizer.ranger import Ranger
+
+optimizer = Ranger(module.parameters())
+```
+If you want, you can specify many more hyperparameters. 
+If you use a learning rate scheduler, you should make sure that the learning rate remains
+ constant for a rather long time, in order to let RAdam start correctly and to take advantage of
+  LookAhead exploration.
+
+An implementation of the [Mish](https://arxiv.org/abs/1908.08681) activation function is also included. Mish seems to perform
+slightly better than ReLu when training deep models, and works well in conjunction with Ranger. 
+To use Mish, you just need to call it:
+```
+from pytorch_template.models.mish import Mish
+
+mish = Mish()
+```
+ 
+
 ## License
 
 This project is licensed under Proprietary License -
