@@ -14,8 +14,7 @@ def read(*parts):
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
     if version_match:
         return version_match.group(1)
     raise RuntimeError('Unable to find version string.')
@@ -37,25 +36,22 @@ setup(
         #   4 - Beta
         #   5 - Production/Stable
         'Development Status :: 3 - Alpha',
-
         # Indicate who your project is intended for
         'Intended Audience :: Data scientists',  # TODO: update
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
-
         # Pick your license as you wish
         'License :: Proprietary license',
-
         # Specify the Python versions you support here.
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.7',
     ],
     keywords='AI deep learning pytorch template',  # TODO: update
     packages=find_packages(exclude=['build', 'data', 'dist', 'docs', 'tests']),
     python_requires='>=3.6',
     install_requires=[
-        'tensorboard>=2.0',
+        'tensorboard >= 2.0',
         'torch >= 1.4',
         'torchvision >= 0.2',
-        'tqdm >= 4.23'
-    ]
+        'tqdm >= 4.23',
+    ],
 )

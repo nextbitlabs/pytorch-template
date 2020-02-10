@@ -21,8 +21,12 @@ def receptive_field(model: nn.Module) -> int:
         for layer in model.modules()
         if hasattr(layer, 'stride') and hasattr(layer, 'kernel_size')
     ]
-    strides = torch.tensor([_get_unique_value(layer.stride) for layer in layers_sequence])
-    kernel_sizes = torch.tensor([_get_unique_value(layer.kernel_size) for layer in layers_sequence])
+    strides = torch.tensor(
+        [_get_unique_value(layer.stride) for layer in layers_sequence]
+    )
+    kernel_sizes = torch.tensor(
+        [_get_unique_value(layer.kernel_size) for layer in layers_sequence]
+    )
     cumulated_strides = torch.cat((torch.tensor(1), strides.cumprod(0)[:-1]), 0)
     return int(torch.sum((kernel_sizes - 1) * cumulated_strides) + 1)
 
@@ -30,6 +34,10 @@ def receptive_field(model: nn.Module) -> int:
 def effective_stride(model: nn.Module) -> int:
     # noinspection PyUnresolvedReferences
     strides = torch.tensor(
-        [_get_unique_value(layer.stride) for layer in model.modules() if hasattr(layer, 'stride')]
+        [
+            _get_unique_value(layer.stride)
+            for layer in model.modules()
+            if hasattr(layer, 'stride')
+        ]
     )
     return int(strides.prod())

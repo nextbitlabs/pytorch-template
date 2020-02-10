@@ -11,9 +11,15 @@ class Monitor:
 
     @property
     def value(self) -> float:
-        return self.cumulated_value / self.num_samples if self.num_samples else float('nan')
+        return (
+            self.cumulated_value / self.num_samples
+            if self.num_samples
+            else float('nan')
+        )
 
-    def update(self, batch_loss: torch.Tensor, batch_size: Optional[int] = None) -> None:
+    def update(
+        self, batch_loss: torch.Tensor, batch_size: Optional[int] = None
+    ) -> None:
         if batch_size is None and self.reduction != 'none':
             raise ValueError('Missing batch size')
         if self.reduction == 'none':
