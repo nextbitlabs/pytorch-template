@@ -26,7 +26,7 @@ class PyTorchTemplate:
             hyperparams = json.load(f)
 
         if (
-                LinearRegression.__name__ == hyperparams['module_name']
+            LinearRegression.__name__ == hyperparams['module_name']
         ):  # TODO: update module
             module_class = LinearRegression  # TODO: update module
         else:
@@ -76,7 +76,7 @@ class PyTorchTemplate:
 
     @staticmethod
     def train(
-            tensor_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float
+        tensor_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float
     ) -> str:
         run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
@@ -113,12 +113,12 @@ class PyTorchTemplate:
 
     @staticmethod
     def restore(
-            checkpoint: str,
-            tensor_dir: str,
-            output_dir: str,
-            batch_size: int,
-            epochs: int,
-            lr: float,
+        checkpoint: str,
+        tensor_dir: str,
+        output_dir: str,
+        batch_size: int,
+        epochs: int,
+        lr: float,
     ) -> str:
         run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
@@ -155,7 +155,7 @@ class PyTorchTemplate:
 
     @staticmethod
     def evaluate(
-            checkpoint: str, tensor_dir: str, batch_size: int
+        checkpoint: str, tensor_dir: str, batch_size: int
     ) -> Tuple[float, float]:
         dev_dataset = TorchDataset(tensor_dir, 'dev')
         dev_loader = DataLoader(
