@@ -10,12 +10,12 @@ from torch.optim.optimizer import Optimizer
 
 class RAdam(Optimizer):
     def __init__(
-            self,
-            params: Iterator,
-            lr: float = 1e-3,
-            betas: Tuple[float, float] = (0.9, 0.999),
-            eps: float = 1e-8,
-            weight_decay: float = 0,
+        self,
+        params: Iterator,
+        lr: float = 1e-3,
+        betas: Tuple[float, float] = (0.9, 0.999),
+        eps: float = 1e-8,
+        weight_decay: float = 0,
     ):
         if not 0.0 <= lr:
             raise ValueError(f"Invalid learning rate: {lr}")
@@ -27,13 +27,13 @@ class RAdam(Optimizer):
             raise ValueError(f"Invalid beta parameter at index 1: {betas[1]}")
 
         if (
-                isinstance(params, (list, tuple))
-                and len(params) > 0
-                and isinstance(params[0], dict)
+            isinstance(params, (list, tuple))
+            and len(params) > 0
+            and isinstance(params[0], dict)
         ):
             for param in params:
                 if 'betas' in param and (
-                        param['betas'][0] != betas[0] or param['betas'][1] != betas[1]
+                    param['betas'][0] != betas[0] or param['betas'][1] != betas[1]
                 ):
                     param['buffer'] = [[None, None, None] for _ in range(10)]
         defaults = dict(
@@ -97,7 +97,7 @@ class RAdam(Optimizer):
                         prod1 = (N_sma - 4) * (N_sma - 2) * N_sma_max * (1 - beta2_t)
                         prod2 = (N_sma_max - 4) * (N_sma_max - 2) * N_sma
                         step_size = math.sqrt(prod1 / prod2) / (
-                                1 - beta1 ** state['step']
+                            1 - beta1 ** state['step']
                         )
 
                     else:

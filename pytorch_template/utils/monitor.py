@@ -18,7 +18,7 @@ class Monitor:
         )
 
     def update(
-            self, batch_loss: torch.Tensor, batch_size: Optional[int] = None
+        self, batch_loss: torch.Tensor, batch_size: Optional[int] = None
     ) -> None:
         if batch_size is None and self.reduction != 'none':
             raise ValueError('Missing batch size')

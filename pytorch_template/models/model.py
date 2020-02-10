@@ -40,12 +40,12 @@ class Model:
         self.criterion = nn.MSELoss()  # TODO: update
 
     def fit(
-            self,
-            working_env: str,
-            loader: DataLoader,
-            epochs: int,
-            lr: float,
-            dev_loader: Optional[DataLoader] = None,
+        self,
+        working_env: str,
+        loader: DataLoader,
+        epochs: int,
+        lr: float,
+        dev_loader: Optional[DataLoader] = None,
     ) -> str:
         working_env = Path(working_env)
         writer = SummaryWriter(working_env / 'logs')

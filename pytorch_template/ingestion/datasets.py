@@ -8,10 +8,10 @@ from torch.utils.data import Dataset
 
 class IngestDataset(Dataset):
     def __init__(
-            self,
-            root_dir: str,
-            split: str,
-            transform: Optional[Callable[[Union[torch.Tensor, float]], Any]] = None,
+        self,
+        root_dir: str,
+        split: str,
+        transform: Optional[Callable[[Union[torch.Tensor, float]], Any]] = None,
     ):
         self.root_dir = Path(root_dir).expanduser()
         self.split = split
@@ -46,10 +46,10 @@ class TorchDataset(Dataset):
     ACCEPTED_EXTENSIONS = ('.pt',)  # TODO: update
 
     def __init__(
-            self,
-            root_dir: str,
-            split: str,
-            transform: Optional[Callable[[Dict], Dict]] = None,
+        self,
+        root_dir: str,
+        split: str,
+        transform: Optional[Callable[[Dict], Dict]] = None,
     ):
         self._features_shape = None
 

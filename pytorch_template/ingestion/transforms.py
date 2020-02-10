@@ -11,7 +11,7 @@ class ToTensor:
 
 class Normalize:
     def __init__(
-            self, mean: Sequence[float], std: Sequence[float], inplace: bool = False
+        self, mean: Sequence[float], std: Sequence[float], inplace: bool = False
     ):
         self.mean = torch.as_tensor(mean)
         self.std = torch.as_tensor(std)
