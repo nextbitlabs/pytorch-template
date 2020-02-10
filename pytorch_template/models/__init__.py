@@ -1,3 +1,3 @@
-from .linear import *
+from .linear import LinearRegression
 from .mish import Mish
-from .model import *
+from .model import Model

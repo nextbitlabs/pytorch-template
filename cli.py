@@ -41,8 +41,12 @@ class CLI:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(description='Ingest data')
         #  TODO: update parameters and default values
-        parser.add_argument('data_dir', metavar='data-dir', type=str, help='Data directory')
-        parser.add_argument('split', type=str, help='Split name', choices=('train', 'dev', 'test'))
+        parser.add_argument(
+            'data_dir', metavar='data-dir', type=str, help='Data directory'
+        )
+        parser.add_argument(
+            'split', type=str, help='Split name', choices=('train', 'dev', 'test')
+        )
 
         args = parser.parse_args(sys.argv[2:])
         PyTorchTemplate.ingest(args.data_dir, args.split)
@@ -53,11 +57,17 @@ class CLI:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(description='Train the model')
         #  TODO: update parameters and default values
-        parser.add_argument('tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory')
-        parser.add_argument('--output-dir', type=str, help='Output directory', default='./')
+        parser.add_argument(
+            'tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory'
+        )
+        parser.add_argument(
+            '--output-dir', type=str, help='Output directory', default='./'
+        )
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=30, help='Number of epochs')
-        parser.add_argument('--lr', type=float, default=0.1, help='Initial learning rate')
+        parser.add_argument(
+            '--lr', type=float, default=0.1, help='Initial learning rate'
+        )
 
         args = parser.parse_args(sys.argv[2:])
         best_checkpoint = PyTorchTemplate.train(
@@ -68,18 +78,31 @@ class CLI:
     @staticmethod
     def restore() -> None:
         #  TODO: update description coherently with usage in __init__
-        parser = argparse.ArgumentParser(description='Restore training from a checkpoint')
+        parser = argparse.ArgumentParser(
+            description='Restore training from a checkpoint'
+        )
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
-        parser.add_argument('tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory')
-        parser.add_argument('--output-dir', type=str, help='Output directory', default='./')
+        parser.add_argument(
+            'tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory'
+        )
+        parser.add_argument(
+            '--output-dir', type=str, help='Output directory', default='./'
+        )
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
-        parser.add_argument('--lr', type=float, default=0.1, help='Initial learning rate')
+        parser.add_argument(
+            '--lr', type=float, default=0.1, help='Initial learning rate'
+        )
 
         args = parser.parse_args(sys.argv[2:])
         best_checkpoint = PyTorchTemplate.restore(
-            args.checkpoint, args.tensor_dir, args.output_dir, args.batch_size, args.epochs, args.lr
+            args.checkpoint,
+            args.tensor_dir,
+            args.output_dir,
+            args.batch_size,
+            args.epochs,
+            args.lr,
         )
         print(f'Best checkpoint saved at {best_checkpoint}')
 
@@ -89,7 +112,9 @@ class CLI:
         parser = argparse.ArgumentParser(description='Evaluate the model')
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
-        parser.add_argument('tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory')
+        parser.add_argument(
+            'tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory'
+        )
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
 
         args = parser.parse_args(sys.argv[2:])
@@ -104,7 +129,9 @@ class CLI:
         parser = argparse.ArgumentParser(description='Test the model')
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
-        parser.add_argument('data_path', metavar='data-path', type=str, help='Data file path')
+        parser.add_argument(
+            'data_path', metavar='data-path', type=str, help='Data file path'
+        )
 
         args = parser.parse_args(sys.argv[2:])
         prediction = PyTorchTemplate.test(args.checkpoint, args.data_path)
