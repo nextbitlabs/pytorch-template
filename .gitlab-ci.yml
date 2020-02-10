@@ -1,2 +1,0 @@
-include:
-  - https://nextbit.gitlab.io/gitlab-ci-templates/pycodestyle.yml
