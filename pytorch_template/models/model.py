@@ -40,12 +40,12 @@ class Model:
         self.criterion = nn.MSELoss()  # TODO: update
 
     def fit(
-            self,
-            working_env: str,
-            loader: DataLoader,
-            epochs: int,
-            lr: float,
-            dev_loader: Optional[DataLoader] = None,
+        self,
+        working_env: str,
+        loader: DataLoader,
+        epochs: int,
+        lr: float,
+        dev_loader: Optional[DataLoader] = None,
     ) -> str:
         working_env = Path(working_env)
         writer = SummaryWriter(working_env / 'logs')
@@ -57,12 +57,18 @@ class Model:
 
         # TODO: update optimizer
         optimizer = torch.optim.SGD(
-            self.module.parameters(), lr=lr, momentum=0.9, nesterov=True, weight_decay=1e-4
+            self.module.parameters(),
+            lr=lr,
+            momentum=0.9,
+            nesterov=True,
+            weight_decay=1e-4,
         )
         logging.info(f'Optimizer: {self._get_optimizer_info(optimizer)}')
 
         # TODO: update scheduler
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=epochs // 3, gamma=0.8)
+        scheduler = torch.optim.lr_scheduler.StepLR(
+            optimizer, step_size=epochs // 3, gamma=0.8
+        )
         logging.info(f'Scheduler: {self._get_scheduler_info(scheduler)}')
 
         total_step = 0

@@ -13,9 +13,7 @@ from pytorch_template.ingestion import ToTensor
 
 def compute_statistics(root_dir: str) -> None:
     # TODO: update transform
-    dataset = IngestDataset(
-        root_dir=root_dir, split='train', transform=ToTensor()
-    )
+    dataset = IngestDataset(root_dir=root_dir, split='train', transform=ToTensor())
 
     loader = torch.utils.data.DataLoader(
         dataset, batch_size=20, num_workers=multiprocessing.cpu_count()

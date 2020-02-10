@@ -15,7 +15,7 @@ from .ingestion.datasets import IngestDataset, TorchDataset
 from .ingestion.transforms import Normalize, ToTensor
 from .models.linear import LinearRegression
 from .models.model import Model
-from .utils.logger import initialize_logger
+from .utils import initialize_logger
 
 
 # TODO: update class name
@@ -25,7 +25,9 @@ class PyTorchTemplate:
         with open(Path(checkpoint).parent.parent / 'hyperparams.json', 'r') as f:
             hyperparams = json.load(f)
 
-        if LinearRegression.__name__ == hyperparams['module_name']:  # TODO: update module
+        if (
+            LinearRegression.__name__ == hyperparams['module_name']
+        ):  # TODO: update module
             module_class = LinearRegression  # TODO: update module
         else:
             raise ValueError('Checkpoint of unsupported module')
@@ -58,7 +60,9 @@ class PyTorchTemplate:
         )
 
         dataset = IngestDataset(root_dir, split, transform=transform)
-        loader = DataLoader(dataset, batch_size=None, num_workers=multiprocessing.cpu_count())
+        loader = DataLoader(
+            dataset, batch_size=None, num_workers=multiprocessing.cpu_count()
+        )
 
         # TODO: update path
         output_dir = Path(root_dir) / 'tensors' / split
@@ -71,7 +75,9 @@ class PyTorchTemplate:
             torch.save(([sample['features'], sample['target']]), output_path)
 
     @staticmethod
-    def train(tensor_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float) -> str:
+    def train(
+        tensor_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float
+    ) -> str:
         run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
         initialize_logger(run_dir)
@@ -107,8 +113,12 @@ class PyTorchTemplate:
 
     @staticmethod
     def restore(
-            checkpoint: str, tensor_dir: str, output_dir: str, batch_size: int, epochs: int,
-            lr: float
+        checkpoint: str,
+        tensor_dir: str,
+        output_dir: str,
+        batch_size: int,
+        epochs: int,
+        lr: float,
     ) -> str:
         run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
@@ -144,7 +154,9 @@ class PyTorchTemplate:
         return best_checkpoint
 
     @staticmethod
-    def evaluate(checkpoint: str, tensor_dir: str, batch_size: int) -> Tuple[float, float]:
+    def evaluate(
+        checkpoint: str, tensor_dir: str, batch_size: int
+    ) -> Tuple[float, float]:
         dev_dataset = TorchDataset(tensor_dir, 'dev')
         dev_loader = DataLoader(
             dev_dataset,
@@ -176,6 +188,8 @@ class PyTorchTemplate:
             ]
         )
 
-        features = {'features': transform(torch.load(data_path))}  # TODO: update data loading
+        features = {
+            'features': transform(torch.load(data_path))
+        }  # TODO: update data loading
         prediction = model.predict(features)
         return prediction

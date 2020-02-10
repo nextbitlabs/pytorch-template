@@ -1,5 +1,5 @@
 name: Lint
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -13,4 +13,4 @@ jobs:
       - name: Install Black
         run: pip install black
       - name: Run black --check .
-        run: black --check .
+        run: black -t py37 -S -v --check .
