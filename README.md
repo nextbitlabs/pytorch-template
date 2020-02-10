@@ -15,13 +15,11 @@ has the following structure:
 ```
 pytorch-template/                   [main folder]
 │   .gitignore                      [files ignored by git]
-│   .gitlab-ci.yml                  [GitLab CI/CD pipelines]
 │   cli.py                          [package command-line interface]
 │   LICENSE                         [code license]
 │   README.md                       [this file]
 │   requirements.txt                [package dependencies]
 │   setup.py                        [package setup script]
-│   setup.cfg                       [parameters for CI/CD]
 │
 ├───data                            [data folder excluded from git tracking]
 │   │   targets.csv                 [targets for train, dev and test data]
@@ -52,7 +50,7 @@ In order to run the code you need to have Python 3.6 installed.
 
 You can install the package on MacOS/Linux with the following commands:
 ```
-git clone git@gitlab.com:nextbit/AI-research/pytorch-template.git
+git clone https://github.com/nextbitlabs/pytorch-template.git
 cd pytorch-template
 python3 setup.py sdist
 python3 setup.py bdist_wheel
@@ -99,19 +97,6 @@ coherence among the different dataset splits or to perform transformations
 that depend on other splits. Here it is not needed because the
 set of labels is not fixed since the example task is a regression.
 
-#### Flow
-
-```mermaid
-graph TD;
-    DataLoader-->|loops over|IngestDataset
-    IngestDataset-->|selects a|sample
-    sample-->|is normalized by|Normalize
-    Normalize-->|and saved on disk by|ToFile
-    ToFile-->decision{ingestion<br/>completed?}
-    decision-->|no|DataLoader
-    decision-->|yes|END
-```
-
 #### Examples
 
 Only the training set and the development set have to be ingested
@@ -130,26 +115,6 @@ python3 cli.py ingest --help
 
 The training phase has always the same structure and the template is built
 to keep all the tried models in files separated from the main training function.
-
-#### Flow 
-
-The flow refers to a single epoch inside the `fit` function of the `Model` class.
-
-```mermaid
-graph TD;
-    DataLoader-->|loops over|NpyDataset
-    NpyDataset-->|selects|samples
-    samples-->|are composed by|features
-    samples-->|are composed by|targets
-    features-->|are analyzed by|LinearRegression1[LinearRegression]
-    LinearRegression1-->|produces|predictions
-    predictions-->|contribute to|MSELoss
-    targets-->|contribute to|MSELoss
-    MSELoss-->|updates|LinearRegression2[LinearRegression]
-    LinearRegression2-->NpyDataset
-    LinearRegression2-->|is evalued on|L1Loss
-    LinearRegression2-->|is saved on|checkpoint[checkpoint file]
-```
 
 The path to the best weight checkpoint according to the metric is printed
 to console at the end of the computation.
@@ -226,23 +191,6 @@ python3 cli.py restore --help
 The `eval` command reproduces the validation performed at the end of every epoch during the training phase.
 It is particularly useful when many datasets are available to evaluate the transfer learning performances.
 
-#### Flow
-
-The flow is almost the same of a single validation during the training phase.
-
-```mermaid
-graph TD;
-    DataLoader-->|loops over|NpyDataset
-    NpyDataset-->|selects|samples
-    samples-->|are composed by|features
-    samples-->|are composed by|targets
-    features-->|are analyzed by|LinearRegression
-    LinearRegression-->|produces|predictions
-    predictions-->|contribute to|L1Loss
-    targets-->|contribute to|L1Loss
-    L1Loss-->NpyDataset
-```
-
 #### Examples
 
 The evaluation can be performed specifying just the model checkpoint
@@ -266,16 +214,6 @@ python3 cli.py eval --help
 ### Command `test`
 
 The `test` command preforms the inference on a single file.
-
-#### Flow
-
-The flow is fairly simple.
-
-```mermaid
-graph TD;
-    features-->|are analyzed by|LinearRegression
-    LinearRegression-->|produces|prediction
-```
 
 #### Examples
 
@@ -305,11 +243,11 @@ on the **NVIDIA Volta Deep Learning AMI** environment.
 1. Log in via ssh following the instructions on the EC2 Management Dashboard.
 2. Clone the repo `pytorch-template` in the home directory.
 3. Download the most update PyTorch container running 
-`docker pull nvcr.io/nvidia/pytorch:<yy>.<mm>-py3`
+`docker pull nvcr.io/nvidia/pytorch:YY.MM-py3`
 4. Create a container with
 ```
 docker run --gpus all --name template -e HOME=$HOME -e USER=$USER \
-    -v $HOME:$HOME -p 6006:6006 --shm-size 60G -it nvcr.io/nvidia/pytorch:<yy>.<mm>-py3
+    -v $HOME:$HOME -p 6006:6006 --shm-size 60G -it nvcr.io/nvidia/pytorch:YY.MM-py3
 ```
 At the end of the procedure you will gain access to a terminal on a Docker
 container configured to work on the GPU and you could simply run the commands
@@ -321,43 +259,47 @@ port 6006 used by TensorBoard is remapped from the container to the port 6006
 of the host machine.
 
 Useful commands to interact with the Docker container are:
-- `docker start galaga`: start the container;
-- `docker exec -it galaga bash`: open a terminal on the container;
-- `docker stop galaga`: stop the container;
-- `docker rm galaga`: remove the container.
+- `docker start template`: start the container;
+- `docker exec -it template bash`: open a terminal on the container;
+- `docker stop template`: stop the container;
+- `docker rm template`: remove the container.
 
 In order to monitor training you can run the following commands from the container console:
 - `watch -n 1 nvidia-smi` to monitor GPU usage;
 - `tensorboard --logdir runs/<run_id> --bind_all` to start Tensorboard.
 
 ## Other 
-The template also includes an implementation of a cool new optimizer, [Ranger](https://medium.com/@lessw/2dc83f79a48d). 
-Ranger uses the [Lookahead](https://arxiv.org/abs/1907.08610) optimization method together with the 
-[RAdam](https://arxiv.org/abs/1908.03265) optimizer.
- It is not used here, as it is way too slow for such a simple model, but it reportedly performs better than other
- Adam variants on deeper models. 
- You can use it simply by calling:
+The template also includes an implementation of a cool new optimizer,
+[Ranger](https://medium.com/@lessw/2dc83f79a48d). 
+Ranger uses the [Lookahead](https://arxiv.org/abs/1907.08610) optimization method 
+together with the [RAdam](https://arxiv.org/abs/1908.03265) optimizer.
+It is not used here, as it is way too slow for such a simple model,
+but it reportedly performs better than other Adam variants on deeper models. 
+
+You can use it simply by calling:
  ```
 from pytorch_template.models.optimizer.ranger import Ranger
 
 optimizer = Ranger(module.parameters())
 ```
-If you want, you can specify many more hyperparameters. 
-If you use a learning rate scheduler, you should make sure that the learning rate remains
- constant for a rather long time, in order to let RAdam start correctly and to take advantage of
-  LookAhead exploration.
 
-An implementation of the [Mish](https://arxiv.org/abs/1908.08681) activation function is also included. Mish seems to perform
-slightly better than ReLu when training deep models, and works well in conjunction with Ranger. 
+If you want, you can specify many more hyper-parameters. 
+If you use a learning rate scheduler, you should make sure that the learning rate remains
+constant for a rather long time, in order to let RAdam start correctly and to take
+advantage of LookAhead exploration.
+
+An implementation of the [Mish](https://arxiv.org/abs/1908.08681) activation function is
+also included. Mish seems to perform slightly better than ReLu when training deep models,
+and works well in conjunction with Ranger. 
+
 To use Mish, you just need to call it:
 ```
 from pytorch_template.models.mish import Mish
 
 mish = Mish()
 ```
- 
 
 ## License
 
-This project is licensed under Proprietary License -
-see the [LICENSE](LICENSE) file for details
+This project is licensed under Apache License 2.0,
+see the [LICENSE](LICENSE) file for details.
