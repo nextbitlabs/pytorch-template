@@ -249,6 +249,7 @@ on the **NVIDIA Deep Learning AMI** environment.
 2. Clone the repo `pytorch-template` in the home directory.
 3. Download the most update PyTorch container running 
 `docker pull nvcr.io/nvidia/pytorch:YY.MM-py3`
+(replace “YY” and “MM” with the most recent version updated monthly)
 4. Create a container with
 ```
 docker run --gpus all --name template -e HOME=$HOME -e USER=$USER \
