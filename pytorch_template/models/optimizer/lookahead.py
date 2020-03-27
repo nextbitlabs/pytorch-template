@@ -82,7 +82,7 @@ class Lookahead(Optimizer):
             'state': state_dict['slow_state'],
             'param_groups': state_dict['param_groups'],
         }
-        super(Lookahead, self).load_state_dict(slow_state_dict)
+        super().load_state_dict(slow_state_dict)
         self.param_groups = self.base_optimizer.param_groups
         if slow_state_new:
             # reapply defaults to catch missing lookahead specific ones

@@ -40,7 +40,7 @@ setup(
         'Intended Audience :: Data scientists',  # TODO: update
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
         # Pick your license as you wish
-        'License :: Proprietary license',
+        'License :: Apache 2.0',
         # Specify the Python versions you support here.
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',

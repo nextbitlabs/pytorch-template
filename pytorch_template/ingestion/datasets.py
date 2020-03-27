@@ -33,7 +33,7 @@ class IngestDataset(Dataset):
         sample = {
             'features': torch.load(filepath),
             'target': self.dataframe.iloc[idx, 0],
-            'filename': filepath.name.rsplit('.', 1)[0],
+            'filename': filepath.name,
         }
 
         if self.transform:

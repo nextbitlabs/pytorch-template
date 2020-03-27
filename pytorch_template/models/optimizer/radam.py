@@ -43,10 +43,10 @@ class RAdam(Optimizer):
             weight_decay=weight_decay,
             buffer=[[None, None, None] for _ in range(10)],
         )
-        super(RAdam, self).__init__(params, defaults)
+        super().__init__(params, defaults)
 
     def __setstate__(self, state):
-        super(RAdam, self).__setstate__(state)
+        super().__setstate__(state)
 
     def step(self, closure=None):
 
