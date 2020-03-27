@@ -4,6 +4,10 @@ Code and documentation template for PyTorch research projects.
 This repository is intended to be cloned at the beginning of any
 new research deep learning project based on PyTorch.
 
+Every TODO comment in the code indicates a portion of the code
+that should be adapted for every specific project.
+The rest of the code should usually remain almost unchanged.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running
@@ -15,7 +19,6 @@ has the following structure:
 ```
 pytorch-template/                   [main folder]
 │   .gitignore                      [files ignored by git]
-│   cli.py                          [package command-line interface]
 │   LICENSE                         [code license]
 │   README.md                       [this file]
 │   requirements.txt                [package dependencies]
@@ -35,6 +38,7 @@ pytorch-template/                   [main folder]
 │       ...
 │
 └───pytorch_template                [package source code folder]
+        __main__.py                 [package command-line interface]
         ...
 ```
 
@@ -65,12 +69,12 @@ python3 generate_data.py
 ## Usage
 
 A command line interface is available to easily interact with the package.
-It is defined in the file `cli.py`.
+It is included inside the package in the file `__main__.py`.
 
 To see more details about the command line interface
 it is possible to show the help page using the command:
 ```
-python3 cli.py --help
+python3 -m pytorch_template --help
 ``` 
 
 The available commands are:
@@ -83,7 +87,7 @@ training;
 
 Every command has its separate help page that can be visualized with
 ```
-python3 cli.py <command> --help
+python3 -m pytorch_template <command> --help
 ```
 
 ### Command `ingest`
@@ -102,13 +106,13 @@ set of labels is not fixed since the example task is a regression.
 Only the training set and the development set have to be ingested
 and that can be do with the following lines:
 ```
-python3 cli.py ingest data train
-python3 cli.py ingest data dev
+python3 -m pytorch_template ingest data train
+python3 -m pytorch_template ingest data dev
 ```
 
 For more details on the usage you can access the help page with the command
 ```
-python3 cli.py ingest --help
+python3 -m pytorch_template ingest --help
 ```
 
 ### Command `train`
@@ -130,13 +134,13 @@ The most basic training can be performed specifying just the directory containin
 the dataset, already split in `train` (compulsory) and `dev` (optional) folders
 using the default values for the other parameters.
 ```
-python3 cli.py train data/tensors
+python3 -m pytorch_template train data/tensors
 ```
 
 An equivalent form of the previous command with all the default values
 manually specified is:
 ```
-python3 cli.py train \
+python3 -m pytorch_template train \
     data/tensors \
     --output-dir . \
     --batch-size 20 \
@@ -146,7 +150,7 @@ python3 cli.py train \
 
 For more details on the usage you can access the help page with the command
 ```
-python3 cli.py train --help
+python3 -m pytorch_template train --help
 ```
 
 ### Command `restore`
@@ -166,13 +170,14 @@ The most basic restored training can be performed specifying just the directory
 containing the dataset, already split in `train` (compulsory) and `dev` (optional)
 folders, and the checkpoint path using the default values for the other parameters.
 ```
-python3 cli.py restore runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt data/tensors
+python3 -m pytorch_template restore \
+    runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt data/tensors
 ```
 
 An equivalent form of the previous command with all the default values
 manually specified is:
 ```
-python3 cli.py restore \
+python3 -m pytorch_template restore \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
     data/tensors \
     --output-dir . \
@@ -183,7 +188,7 @@ python3 cli.py restore \
 
 For more details on the usage you can access the help page with the command
 ```
-python3 cli.py restore --help
+python3 -m pytorch_template restore --help
 ```
 
 ### Command `eval`
@@ -200,7 +205,7 @@ value is 20.
 
 A full call to the command is:
 ```
-python3 cli.py eval \
+python3 -m pytorch_template eval \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
     data/tensors \
     --batch-size 20
@@ -208,7 +213,7 @@ python3 cli.py eval \
 
 For more details on the usage you can access the help page with the command
 ```
-python3 cli.py eval --help
+python3 -m pytorch_template eval --help
 ```
 
 ### Command `test`
@@ -220,14 +225,14 @@ The `test` command preforms the inference on a single file.
 The test of the model is performed specifying the model checkpoint to be evaluated
 and the path to a sample, for example:
 ```
-python3 cli.py test \
+python3 -m pytorch_template test \
     runs/<secfromepochs>/checkpoints/model-<epoch>-<metric>.ckpt \
     data/test/<sample>.pt
 ```
 
 For more details on the usage you can access the help page with the command
 ```
-python3 cli.py test --help
+python3 -m pytorch_template test --help
 ```
 
 ## Performances
@@ -238,12 +243,13 @@ The model converges to perfect predictions using default parameters.
 
 The template can be deployed on an NGC optimized instance, here we list
 the steps necessary to configure it on a AWS EC2 **g4dn.xlarge** instance
-on the **NVIDIA Volta Deep Learning AMI** environment.
+on the **NVIDIA Deep Learning AMI** environment.
 
 1. Log in via ssh following the instructions on the EC2 Management Dashboard.
 2. Clone the repo `pytorch-template` in the home directory.
 3. Download the most update PyTorch container running 
 `docker pull nvcr.io/nvidia/pytorch:YY.MM-py3`
+(replace “YY” and “MM” with the most recent version updated monthly)
 4. Create a container with
 ```
 docker run --gpus all --name template -e HOME=$HOME -e USER=$USER \

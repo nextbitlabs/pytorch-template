@@ -6,7 +6,7 @@ import torch
 class Monitor:
     def __init__(self, reduction: str = 'mean'):
         self.reduction = reduction
-        self.cumulated_value = 0
+        self.cumulated_value = 0.0
         self.num_samples = 0
 
     @property

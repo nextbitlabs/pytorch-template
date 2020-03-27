@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from pytorch_template.main import PyTorchTemplate  # TODO: update
+from pytorch_template.app import PyTorchTemplate  # TODO: update
 
 
 class CLI:

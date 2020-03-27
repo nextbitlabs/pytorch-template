@@ -10,7 +10,7 @@ def initialize_weights(m: nn.Module) -> None:
 
 class LinearRegression(nn.Module):
     def __init__(self, features_size: int):
-        super(LinearRegression, self).__init__()
+        super().__init__()
         # TODO: update model layers
         self.fc = nn.Linear(features_size, 1)
         self.hyperparams = {
@@ -19,6 +19,7 @@ class LinearRegression(nn.Module):
         }
         self.apply(initialize_weights)
 
+    # TODO: update forward function
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # noinspection PyUnresolvedReferences
         prediction = torch.squeeze(self.fc(x))
