@@ -126,9 +126,7 @@ to console at the end of the computation.
 #### Examples
 
 The command has many optional training-related parameters commonly tuned by the 
-experimenter, like `batch-size`, `epochs`, `lr`. 
-Logging options are also available: `silent` to log only warning 
-messages, and `debug` for a more verbose logging. 
+experimenter, like `batch-size`, `epochs`, `lr`.
 
 The most basic training can be performed specifying just the directory containing
 the dataset, already split in `train` (compulsory) and `dev` (optional) folders
