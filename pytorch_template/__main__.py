@@ -69,7 +69,7 @@ class CLI:
             'tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory'
         )
         parser.add_argument(
-            '--output-dir', type=str, help='Output directory', default='./'
+            '--output-dir', type=str, help='Output directory', default='./runs'
         )
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=30, help='Number of epochs')
@@ -98,7 +98,7 @@ class CLI:
             'tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory'
         )
         parser.add_argument(
-            '--output-dir', type=str, help='Output directory', default='./'
+            '--output-dir', type=str, help='Output directory', default='./runs'
         )
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
