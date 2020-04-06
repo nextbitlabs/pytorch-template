@@ -61,8 +61,8 @@ class CLI:
         parser = argparse.ArgumentParser(
             description='Train the model',
             usage='python3 -m pytorch_template train tensor-dir '
-                  '[--output-dir OUTPUT-DIR --batch-size BATCH-SIZE '
-                  '--epochs EPOCHS --lr LR]',
+            '[--output-dir OUTPUT-DIR --batch-size BATCH-SIZE '
+            '--epochs EPOCHS --lr LR]',
         )
         #  TODO: update parameters and default values
         parser.add_argument(
@@ -89,8 +89,8 @@ class CLI:
         parser = argparse.ArgumentParser(
             description='Restore training from a checkpoint',
             usage='python3 -m pytorch_template restore tensor-dir '
-                  '[--output-dir OUTPUT-DIR --batch-size BATCH-SIZE '
-                  '--epochs EPOCHS --lr LR]',
+            '[--output-dir OUTPUT-DIR --batch-size BATCH-SIZE '
+            '--epochs EPOCHS --lr LR]',
         )
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
@@ -123,7 +123,7 @@ class CLI:
         parser = argparse.ArgumentParser(
             description='Evaluate the model',
             usage='python3 -m pytorch_template eval checkpoint tensor-dir '
-                  '[--batch-size BATCH-SIZE]',
+            '[--batch-size BATCH-SIZE]',
         )
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
