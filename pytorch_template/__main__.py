@@ -12,7 +12,7 @@ class CLI:
         parser = argparse.ArgumentParser(
             description='Command line interface for PyTorch template',
             usage=(
-                'python3 cli.py <command> [<args>]\n'
+                'python3 -m pytorch_template <command> [<args>]\n'
                 '\n'
                 'ingest      Ingest data\n'
                 'train       Train the model\n'
@@ -39,7 +39,10 @@ class CLI:
     @staticmethod
     def ingest() -> None:
         #  TODO: update description coherently with usage in __init__
-        parser = argparse.ArgumentParser(description='Ingest data')
+        parser = argparse.ArgumentParser(
+            description='Ingest data',
+            usage='python3 -m pytorch_template ingest data-dir split',
+        )
         #  TODO: update parameters and default values
         parser.add_argument(
             'data_dir', metavar='data-dir', type=str, help='Data directory'
@@ -55,13 +58,18 @@ class CLI:
     @staticmethod
     def train() -> None:
         #  TODO: update description coherently with usage in __init__
-        parser = argparse.ArgumentParser(description='Train the model')
+        parser = argparse.ArgumentParser(
+            description='Train the model',
+            usage='python3 -m pytorch_template train tensor-dir '
+            '[--output-dir OUTPUT-DIR --batch-size BATCH-SIZE '
+            '--epochs EPOCHS --lr LR]',
+        )
         #  TODO: update parameters and default values
         parser.add_argument(
             'tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory'
         )
         parser.add_argument(
-            '--output-dir', type=str, help='Output directory', default='./'
+            '--output-dir', type=str, help='Output directory', default='./runs'
         )
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=30, help='Number of epochs')
@@ -79,7 +87,10 @@ class CLI:
     def restore() -> None:
         #  TODO: update description coherently with usage in __init__
         parser = argparse.ArgumentParser(
-            description='Restore training from a checkpoint'
+            description='Restore training from a checkpoint',
+            usage='python3 -m pytorch_template restore tensor-dir '
+            '[--output-dir OUTPUT-DIR --batch-size BATCH-SIZE '
+            '--epochs EPOCHS --lr LR]',
         )
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
@@ -87,7 +98,7 @@ class CLI:
             'tensor_dir', metavar='tensor-dir', type=str, help='Tensors directory'
         )
         parser.add_argument(
-            '--output-dir', type=str, help='Output directory', default='./'
+            '--output-dir', type=str, help='Output directory', default='./runs'
         )
         parser.add_argument('--batch-size', type=int, default=20, help='Batch size')
         parser.add_argument('--epochs', type=int, default=40, help='Number of epochs')
@@ -109,7 +120,11 @@ class CLI:
     @staticmethod
     def eval() -> None:
         #  TODO: update description coherently with usage in __init__
-        parser = argparse.ArgumentParser(description='Evaluate the model')
+        parser = argparse.ArgumentParser(
+            description='Evaluate the model',
+            usage='python3 -m pytorch_template eval checkpoint tensor-dir '
+            '[--batch-size BATCH-SIZE]',
+        )
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
         parser.add_argument(
@@ -126,7 +141,10 @@ class CLI:
     @staticmethod
     def test() -> None:
         #  TODO: update description coherently with usage in __init__
-        parser = argparse.ArgumentParser(description='Test the model')
+        parser = argparse.ArgumentParser(
+            description='Test the model',
+            usage='python3 -m pytorch_template test checkpoint data-path',
+        )
         #  TODO: update parameters and default values
         parser.add_argument('checkpoint', type=str, help='Checkpoint path')
         parser.add_argument(

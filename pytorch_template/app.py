@@ -78,7 +78,7 @@ class PyTorchTemplate:
     def train(
         tensor_dir: str, output_dir: str, batch_size: int, epochs: int, lr: float
     ) -> str:
-        run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
+        run_dir = Path(output_dir) / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
         initialize_logger(run_dir)
 
@@ -120,7 +120,7 @@ class PyTorchTemplate:
         epochs: int,
         lr: float,
     ) -> str:
-        run_dir = Path(output_dir) / 'runs' / str(int(time.time()))
+        run_dir = Path(output_dir) / str(int(time.time()))
         (run_dir / 'checkpoints').mkdir(parents=True)
         initialize_logger(run_dir)
 
