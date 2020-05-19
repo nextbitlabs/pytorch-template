@@ -6,6 +6,7 @@ from typing import Optional, Tuple, Dict
 import torch
 import torch.nn as nn
 import torch.optim
+from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
@@ -18,7 +19,7 @@ class Model:
     SUMMARY_STEPS = 10  # TODO: update
 
     @staticmethod
-    def _get_optimizer_info(optimizer: torch.optim.Optimizer) -> str:
+    def _get_optimizer_info(optimizer: Optimizer) -> str:
         info = type(optimizer).__name__
         for attr in optimizer.defaults:
             info = info + f" | {attr}: {optimizer.defaults[attr]}"

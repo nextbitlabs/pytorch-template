@@ -6,13 +6,13 @@ import torch
 class Monitor:
     def __init__(self, reduction: str = 'mean'):
         self.reduction = reduction
-        self.cumulated_value = 0.0
+        self.cumulative_value = 0.0
         self.num_samples = 0
 
     @property
     def value(self) -> float:
         return (
-            self.cumulated_value / self.num_samples
+            self.cumulative_value / self.num_samples
             if self.num_samples
             else float('nan')
         )
@@ -27,15 +27,15 @@ class Monitor:
                 raise ValueError('Wrong specified batch size')
             else:
                 batch_size = batch_loss.size(0)
-            self.cumulated_value += torch.sum(batch_loss).item()
+            self.cumulative_value += torch.sum(batch_loss).item()
         elif self.reduction == 'mean':
-            self.cumulated_value += batch_size * batch_loss.item()
+            self.cumulative_value += batch_size * batch_loss.item()
         elif self.reduction == 'sum':
-            self.cumulated_value += batch_loss.item()
+            self.cumulative_value += batch_loss.item()
         else:
             raise ValueError('Unknown reduction method')
         self.num_samples += batch_size
 
     def reset(self):
-        self.cumulated_value = 0
+        self.cumulative_value = 0
         self.num_samples = 0
